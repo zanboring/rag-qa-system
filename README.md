@@ -75,6 +75,7 @@ curl -X DELETE http://localhost:8000/documents/{doc_id}
 | POST | /query | 提问（检索 + 重排 + 生成 + 溯源，`rerank=true` 开启精排） |
 | GET | /documents | 分页列出已入库文档（`page`/`page_size`，按入库时间倒序） |
 | GET | /documents/{doc_id} | 获取单个文档元数据 |
+| PUT | /documents/{doc_id} | 更新文档（删旧片段 + 重新入库，name/text 至少传一个） |
 | DELETE | /documents/{doc_id} | 删除文档及其全部向量片段 |
 | GET | /health | 健康检查 + 当前后端 |
 
@@ -112,4 +113,4 @@ set VECTOR_BACKEND=chroma
 - 向量库换 ChromaDB / Milvus，支持持久化与近似检索
 - 重排序换 cross-encoder（如 bge-reranker）做深度语义精排（当前为零依赖 RRF 词法重排）
 - 引用溯源加「片段高亮」与「来源置信度」
-- 文档更新（当前已支持删除，更新 = 删除旧片段 + 重新入库）
+- 支持文档批量上传、整库重建

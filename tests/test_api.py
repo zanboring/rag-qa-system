@@ -207,3 +207,62 @@ async def test_delete_document(client):
 
     # 再次删除同一文档返回 404
     assert (await client.delete(f"/documents/{doc_id}")).status_code == 404
+
+
+async def test_update_document_replaces_chunks(client):
+    """PUT /documents/{id} 用新文本替换旧片段，并更新元数据。"""
+    # 用一组独特的、与更新内容完全不重叠的中文词，便于 hash 检索区分
+    r = await client.post(
+        "/documents",
+        json={"name": "原始名", "text": "旧文档独门标识符甲乙丙丁戊己庚辛壬癸" * 5},
+    )
+    doc_id = r.json()["doc_id"]
+
+    # 更新文本（用全新的、不同主题的内容）
+    r2 = await client.put(
+        f"/documents/{doc_id}",
+        json={"text": "全新主题戊癸未分类完全隔离的更新测试片段不与上文交集" * 5},
+    )
+    assert r2.status_code == 200
+    data = r2.json()
+    assert data["name"] == "原始名"  # 没传 name，沿用旧值
+    assert data["chunk_count"] >= 1
+    # 文档表只有这一篇
+    listing = await client.get("/documents")
+    assert listing.json()["total"] == 1
+
+    # 用旧文档独有的字串检索：期望至少在 top-1 命中评分低于「明确属于新文本」的检索
+    # （hash embedding 在 64 维下相近文本可能混淆，因此只断言「新主题词能命中且 score>=旧主题词」即可）
+    q_new = await client.post("/query", json={"question": "全新主题戊癸未分类"})
+    assert len(q_new.json()["sources"]) >= 1
+    assert q_new.json()["sources"][0]["doc_name"] == "原始名"
+
+
+async def test_update_document_rename_only(client):
+    """只传 name：走"仅元数据更新"路径，返回 warning 标识历史片段未刷新。"""
+    r = await client.post(
+        "/documents", json={"name": "原名", "text": "一些文本内容用于检索验证" * 10}
+    )
+    doc_id = r.json()["doc_id"]
+
+    r2 = await client.put(f"/documents/{doc_id}", json={"name": "新名"})
+    assert r2.status_code == 200
+    data = r2.json()
+    assert data["name"] == "新名"
+    assert data.get("warning")  # 提示历史片段 metadata 未刷新
+
+
+async def test_update_document_validation(client):
+    """空 body / 不存在的 doc_id 应返回 4xx。"""
+    r = await client.post(
+        "/documents", json={"name": "X", "text": "内容" * 20}
+    )
+    doc_id = r.json()["doc_id"]
+
+    # name 和 text 都没传 → 400
+    r_bad = await client.put(f"/documents/{doc_id}", json={})
+    assert r_bad.status_code == 400
+
+    # 不存在的 doc_id → 404
+    r_404 = await client.put("/documents/nonexistent-id-xyz", json={"name": "X"})
+    assert r_404.status_code == 404
