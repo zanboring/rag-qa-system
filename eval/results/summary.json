@@ -1,12 +1,13 @@
 [
   {
-    "config": "hash+memory+mock+rerankoff",
+    "config": "hash256+memory+mock+rerankoff",
     "config_detail": {
       "embedding": "hash",
       "vector": "memory",
       "llm": "mock",
       "rerank": false,
-      "top_k": 5
+      "top_k": 5,
+      "hash_dim": 256
     },
     "summary": {
       "sample_total": 54,
@@ -28,20 +29,21 @@
       "generation_metrics_available": false,
       "abstention_accuracy": null,
       "false_abstention_rate": null,
-      "latency_p50_ms": 2.88,
-      "latency_p95_ms": 3.6
+      "latency_p50_ms": 2.32,
+      "latency_p95_ms": 2.89
     },
-    "index_seconds": 0.055,
-    "eval_seconds": 0.22
+    "index_seconds": 0.04,
+    "eval_seconds": 0.176
   },
   {
-    "config": "hash+memory+mock+rerankon",
+    "config": "hash256+memory+mock+rerankon",
     "config_detail": {
       "embedding": "hash",
       "vector": "memory",
       "llm": "mock",
       "rerank": true,
-      "top_k": 5
+      "top_k": 5,
+      "hash_dim": 256
     },
     "summary": {
       "sample_total": 54,
@@ -63,10 +65,82 @@
       "generation_metrics_available": false,
       "abstention_accuracy": null,
       "false_abstention_rate": null,
-      "latency_p50_ms": 4.27,
-      "latency_p95_ms": 6.02
+      "latency_p50_ms": 3.14,
+      "latency_p95_ms": 3.8
     },
-    "index_seconds": 0.041,
-    "eval_seconds": 0.294
+    "index_seconds": 0.034,
+    "eval_seconds": 0.214
+  },
+  {
+    "config": "hash4096+memory+mock+rerankoff",
+    "config_detail": {
+      "embedding": "hash",
+      "vector": "memory",
+      "llm": "mock",
+      "rerank": false,
+      "top_k": 5,
+      "hash_dim": 4096
+    },
+    "summary": {
+      "sample_total": 54,
+      "answerable": 50,
+      "unanswerable": 4,
+      "hit_at_1": 0.68,
+      "hit_at_3": 0.88,
+      "hit_at_5": 0.92,
+      "recall_at_3": 0.83,
+      "recall_at_5": 0.89,
+      "precision_at_3": 0.3133,
+      "mrr": 0.779,
+      "ndcg_at_5": 0.8092,
+      "keyword_coverage": 0.125,
+      "context_recall": 0.9533,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "mock_backend_ratio": 1.0,
+      "generation_metrics_available": false,
+      "abstention_accuracy": null,
+      "false_abstention_rate": null,
+      "latency_p50_ms": 30.92,
+      "latency_p95_ms": 33.56
+    },
+    "index_seconds": 0.056,
+    "eval_seconds": 1.774
+  },
+  {
+    "config": "hash4096+memory+mock+rerankon",
+    "config_detail": {
+      "embedding": "hash",
+      "vector": "memory",
+      "llm": "mock",
+      "rerank": true,
+      "top_k": 5,
+      "hash_dim": 4096
+    },
+    "summary": {
+      "sample_total": 54,
+      "answerable": 50,
+      "unanswerable": 4,
+      "hit_at_1": 0.74,
+      "hit_at_3": 0.94,
+      "hit_at_5": 0.96,
+      "recall_at_3": 0.9,
+      "recall_at_5": 0.93,
+      "precision_at_3": 0.34,
+      "mrr": 0.8283,
+      "ndcg_at_5": 0.8576,
+      "keyword_coverage": 0.1317,
+      "context_recall": 0.9933,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "mock_backend_ratio": 1.0,
+      "generation_metrics_available": false,
+      "abstention_accuracy": null,
+      "false_abstention_rate": null,
+      "latency_p50_ms": 31.69,
+      "latency_p95_ms": 35.09
+    },
+    "index_seconds": 0.051,
+    "eval_seconds": 1.803
   }
 ]

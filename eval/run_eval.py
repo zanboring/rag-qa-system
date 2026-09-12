@@ -78,11 +78,19 @@ class EvalConfig:
     llm: str
     rerank: bool
     top_k: int = DEFAULT_TOP_K
+    # 仅对 hash embedding 生效：哈希桶数量（即向量维度）。
+    # 把它暴露成配置项的原因：hash embedding 的主要误差来源是哈希碰撞——
+    # 3-gram 的种类数远多于桶数时，不同 n-gram 会落进同一个桶，向量区分度下降。
+    # 对比不同维度可以在不引入任何模型的前提下，验证「表示能力是检索质量瓶颈」。
+    hash_dim: int | None = None
 
     @property
     def label(self) -> str:
         """配置标签，用于文件名与报告表格行名。"""
-        return f"{self.embedding}+{self.vector}+{self.llm}+rerank{'on' if self.rerank else 'off'}"
+        head = self.embedding
+        if self.embedding == "hash" and self.hash_dim:
+            head = f"hash{self.hash_dim}"
+        return f"{head}+{self.vector}+{self.llm}+rerank{'on' if self.rerank else 'off'}"
 
 
 @dataclass
@@ -238,6 +246,9 @@ async def evaluate_config(
     config.EMBEDDING_BACKEND = cfg.embedding
     config.VECTOR_BACKEND = cfg.vector
     config.LLM_BACKEND = cfg.llm
+    if cfg.hash_dim:
+        os.environ["HASH_EMBED_DIM"] = str(cfg.hash_dim)
+        config.HASH_EMBED_DIM = cfg.hash_dim
 
     pipeline = RAGPipeline(get_embedder(), get_vectorstore(), get_llm())
 
@@ -541,12 +552,25 @@ async def main_async(args: argparse.Namespace) -> int:
     # 2. 组装配置矩阵
     embeddings = [e.strip() for e in args.embedding.split(",") if e.strip()]
     rerank_options = [False, True] if args.rerank == "both" else [args.rerank == "on"]
+    hash_dims: list[int | None] = [int(d) for d in args.hash_dims.split(",") if d.strip()]
 
-    configs = [
-        EvalConfig(embedding=emb, vector=args.vector, llm=args.llm, rerank=rr, top_k=args.top_k)
-        for emb in embeddings
-        for rr in rerank_options
-    ]
+    configs: list[EvalConfig] = []
+    for emb in embeddings:
+        # 哈希维度只对 hash 后端有意义；其它后端忽略该参数，
+        # 否则会对 bge 生成多份完全相同的配置，白白重复跑评测。
+        dims: list[int | None] = hash_dims if emb == "hash" else [None]
+        for dim in dims:
+            for rr in rerank_options:
+                configs.append(
+                    EvalConfig(
+                        embedding=emb,
+                        vector=args.vector,
+                        llm=args.llm,
+                        rerank=rr,
+                        top_k=args.top_k,
+                        hash_dim=dim,
+                    )
+                )
 
     judge = get_judge()
     print(f"裁判后端：{judge.name}")
@@ -623,6 +647,13 @@ def parse_args() -> argparse.Namespace:
         default="both",
         choices=("on", "off", "both"),
         help="是否开启重排；both 表示两种都跑，用于对比重排增益",
+    )
+    parser.add_argument(
+        "--hash-dims",
+        default="256",
+        dest="hash_dims",
+        help="hash embedding 的向量维度，逗号分隔（如 256,4096）。仅对 hash 后端生效，"
+             "用于观察哈希碰撞对检索质量的影响",
     )
     parser.add_argument("--top-k", type=int, default=DEFAULT_TOP_K, dest="top_k")
     parser.add_argument("--concurrency", type=int, default=4, help="样本并发数")
