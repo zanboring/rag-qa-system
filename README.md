@@ -133,6 +133,9 @@ curl -X POST http://localhost:8000/query \
 | hash4096，无重排 | 0.6800 | 0.8800 | 0.9200 | 0.8900 | 0.7790 | 0.8092 | 30.9 ms |
 | **hash4096，开启重排** | **0.7400** | **0.9400** | **0.9600** | **0.9300** | **0.8283** | **0.8576** | 31.7 ms |
 
+（表内延迟为**参考值**，随机器负载浮动；这里是不含 LLM 调用的纯检索耗时。
+接入真实模型后的端到端延迟见下一节——两者差了三个数量级，不应混为一谈。）
+
 两个可以直接引用的结论：
 
 **1. 表示能力是检索的第一瓶颈。**
@@ -491,8 +494,11 @@ L2 距离 = 0.5  ⇒  实际余弦相似度 ≈ 0.875，而 1 - 0.5 = 0.5
 - Dockerfile 与 docker-compose.yml 已完成，YAML 语法已校验通过
   （`services: api` / `volumes: chroma_data` 解析正常）；
   但开发本机未安装 Docker，**镜像构建与容器启动未经实测**，首次部署前请先本地 `docker compose up` 验证
-- **BGE 等语义 embedding 的对比指标尚未产出**：`sentence-transformers`
-  （含 torch，约数百 MB）安装未完成。评测框架已支持 `--embedding bge`，
-  依赖装好后可直接补跑，命令见上文「怎么复现」
-- 因此上文所有指标均来自 hash embedding。它能证明链路正确与相对趋势，
-  **但不能代表语义模型的效果上限**
+- **语义 embedding 的对比指标尚未产出**。原因有两层：DeepSeek 只提供对话接口、
+  **没有 embedding API**，无法用于向量化；而本地 BGE（`sentence-transformers`，
+  含 torch 约数百 MB）安装未完成。评测框架已支持 `--embedding bge`，依赖装好后可直接补跑，
+  命令见上文「怎么复现」。（机器上已配置 `OLLAMA_API_BASE`，若启动 Ollama 并
+  `ollama pull nomic-embed-text`，也可作为语义 embedding 的替代方案。）
+- 因此上文的**检索指标**全部来自 hash embedding——能证明链路正确与相对趋势，
+  **但不能代表语义模型的效果上限**。而**生成与拒答指标已由 DeepSeek 真实产出**，
+  这部分是完整可信的（已注明裁判偏差与波动范围）
