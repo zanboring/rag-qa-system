@@ -410,3 +410,13 @@ L2 距离 = 0.5  ⇒  实际余弦相似度 ≈ 0.875，而 1 - 0.5 = 0.5
 - 未接入可观测性（结构化日志、指标上报、链路追踪），生产排查依赖日志检索
 - 缓存层缺失：相同问题的重复查询会走完整链路，可加 Redis 缓存
 - 增量索引与整库重建未实现，文档批量更新只能逐篇走 PUT
+
+**当前验证状态（如实标注）**
+- Dockerfile 与 docker-compose.yml 已完成，YAML 语法已校验通过
+  （`services: api` / `volumes: chroma_data` 解析正常）；
+  但开发本机未安装 Docker，**镜像构建与容器启动未经实测**，首次部署前请先本地 `docker compose up` 验证
+- **BGE 等语义 embedding 的对比指标尚未产出**：`sentence-transformers`
+  （含 torch，约数百 MB）安装未完成。评测框架已支持 `--embedding bge`，
+  依赖装好后可直接补跑，命令见上文「怎么复现」
+- 因此上文所有指标均来自 hash embedding。它能证明链路正确与相对趋势，
+  **但不能代表语义模型的效果上限**
