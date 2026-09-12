@@ -1,0 +1,12 @@
+# ChromaDB 向量库的可选依赖。
+#
+# 基础依赖（requirements.txt）刻意不包含 chromadb：默认的内存向量库为零依赖实现，
+# 保证项目 clone 下来装完基础依赖就能跑通、能跑测试，不必先下载几百 MB 的向量库依赖。
+# 只有在需要「持久化」或「大规模 ANN 检索」时才安装本文件：
+#
+#     pip install -r requirements-chroma.txt
+#     set VECTOR_BACKEND=chroma
+#     set CHROMA_PATH=./chroma_db
+
+-r requirements.txt
+chromadb>=0.5.0

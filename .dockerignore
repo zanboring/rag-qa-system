@@ -1,0 +1,45 @@
+# 构建上下文排除清单。
+# 作用有两个：缩小发送给 Docker daemon 的上下文体积、加快构建；
+# 以及避免把本地环境与密钥打进镜像层（镜像层一旦写入，即使后续删除也能被还原）。
+
+# 版本控制
+.git
+.gitignore
+.gitattributes
+
+# Python 环境与缓存
+.venv
+venv
+env
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+
+# 测试与覆盖率产物
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 密钥与环境变量：绝不能进镜像
+.env
+*.pem
+*.key
+
+# 向量库本地数据（由 volume 挂载，不需要打进镜像）
+chroma_db/
+data/
+
+# 评测输出（每次跑都会重新生成）
+eval/results/
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+
+# 文档（README 保留，随镜像分发便于容器内查阅）
+docs/
+Dockerfile
+docker-compose.yml

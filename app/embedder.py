@@ -19,6 +19,14 @@ class Embedder:
     async def embed(self, text: str) -> list[float]:
         raise NotImplementedError
 
+    async def aclose(self) -> None:
+        """释放后端持有的资源（如 HTTP 连接池）。
+
+        默认空实现：本地模型与哈希实现不持有外部连接，无需清理。
+        持有 httpx.AsyncClient 的后端必须覆写，否则连接池会一直驻留到进程退出。
+        """
+        return None
+
 
 class HashEmbedder(Embedder):
     """基于字符 n-gram 哈希的确定性 Embedding（零依赖、可离线跑）。
@@ -68,8 +76,12 @@ class ZhipuEmbedder(Embedder):
             raise ValueError("使用 zhipu embedding 后端需设置 ZHIPU_API_KEY 环境变量")
         self.api_key = api_key
         self.model = model
-        # 复用连接池：避免每次请求都建立新 TCP 连接
+        # 复用连接池：避免每次请求都建立新 TCP 连接。
+        # 注意配套的 aclose()：连接池不关闭会一直占用文件描述符与连接资源。
         self._client = httpx.AsyncClient(timeout=60)
+
+    async def aclose(self) -> None:
+        await self._client.aclose()
 
     async def embed(self, text: str) -> list[float]:
         resp = await self._client.post(

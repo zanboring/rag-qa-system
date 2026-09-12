@@ -26,6 +26,11 @@ HASH_EMBED_DIM = int(os.getenv("HASH_EMBED_DIM", "256"))
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 
+# ChromaDB 持久化路径。
+# 为空 → 使用纯内存模式，进程退出数据即丢失（适合本地开发与测试）；
+# 非空 → 数据落盘到该目录，容器重启后依然可检索（部署时必须设置）。
+CHROMA_PATH = os.getenv("CHROMA_PATH", "")
+
 # 智谱 GLM-4 云端
 ZHIPU_API_KEY = os.getenv("ZHIPU_API_KEY", "")
 ZHIPU_EMBED_MODEL = os.getenv("ZHIPU_EMBED_MODEL", "embedding-3")

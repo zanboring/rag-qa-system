@@ -1,0 +1,53 @@
+# 一键启动：docker compose up -d
+#
+# 默认配置（hash / memory / mock）是零依赖的：不需要 GPU、不需要网络、
+# 不需要 API Key，容器起来即可用，方便快速验证与演示。
+# 要接真实模型，复制 .env.example 为 .env 并修改对应变量即可。
+
+services:
+  api:
+    build: .
+    image: rag-kb:latest
+    container_name: rag-kb
+    ports:
+      - "8000:8000"
+
+    environment:
+      # 用 :- 提供默认值，保证没有 .env 文件时也能直接启动
+      EMBEDDING_BACKEND: ${EMBEDDING_BACKEND:-hash}
+      VECTOR_BACKEND: ${VECTOR_BACKEND:-memory}
+      LLM_BACKEND: ${LLM_BACKEND:-mock}
+      CHUNK_SIZE: ${CHUNK_SIZE:-500}
+      CHUNK_OVERLAP: ${CHUNK_OVERLAP:-50}
+      # 注意：CHROMA_PATH 只在 VECTOR_BACKEND=chroma 时生效
+      CHROMA_PATH: ${CHROMA_PATH:-/data/chroma}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:7b}
+      # 密钥只从宿主机环境注入，绝不写进镜像或提交进仓库
+      ZHIPU_API_KEY: ${ZHIPU_API_KEY:-}
+
+    volumes:
+      # 向量库落盘目录。没有这个 volume 时，容器重建会导致索引数据全部丢失，
+      # 需要重新上传并向量化所有文档。
+      - chroma_data:/data/chroma
+
+    extra_hosts:
+      # 让容器内可通过 host.docker.internal 访问宿主机的 Ollama。
+      # Docker Desktop（Mac/Windows）自带该域名解析，Linux 需要显式声明。
+      - "host.docker.internal:host-gateway"
+
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).getcode()==200 else 1)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    restart: unless-stopped
+
+volumes:
+  chroma_data:

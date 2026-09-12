@@ -15,6 +15,14 @@ class LLM:
     async def generate(self, system: str, prompt: str) -> str:
         raise NotImplementedError
 
+    async def aclose(self) -> None:
+        """释放后端持有的资源（如 HTTP 连接池）。
+
+        默认空实现：mock 不持有外部连接。持有 httpx.AsyncClient 的后端必须覆写，
+        由服务关闭阶段统一调用，否则连接池会驻留到进程退出。
+        """
+        return None
+
 
 class MockLLM(LLM):
     """确定性假模型：回显参考资料的来源编号，方便验证 RAG 链路。"""
@@ -32,6 +40,9 @@ class OllamaLLM(LLM):
         self.model = model
         # 复用连接池
         self._client = httpx.AsyncClient(timeout=120)
+
+    async def aclose(self) -> None:
+        await self._client.aclose()
 
     async def generate(self, system: str, prompt: str) -> str:
         resp = await self._client.post(
@@ -59,6 +70,9 @@ class GLM4LLM(LLM):
         self.model = model
         # 复用连接池
         self._client = httpx.AsyncClient(timeout=120)
+
+    async def aclose(self) -> None:
+        await self._client.aclose()
 
     async def generate(self, system: str, prompt: str) -> str:
         resp = await self._client.post(
