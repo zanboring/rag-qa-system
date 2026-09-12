@@ -2,6 +2,7 @@
 
 接口：
     POST   /documents         上传文档（切片 + 向量化 + 入库）
+    POST   /documents/batch   批量上传文档（部分失败不影响整体）
     POST   /query             提问（检索 + 生成 + 溯源）
     GET    /documents         列出已入库文档（支持分页）
     GET    /documents/{doc_id} 获取单个文档元数据
@@ -20,7 +21,7 @@ import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app import config
 from app.chunker import chunk_text
@@ -70,7 +71,7 @@ class DocumentRequest(BaseModel):
 
 class QueryRequest(BaseModel):
     question: str
-    top_k: int = 3
+    top_k: int = Field(3, ge=1, le=50, description="检索片段数，上限 50 防止过大召回")
     rerank: bool = False
 
 
@@ -80,8 +81,27 @@ class DocumentUpdateRequest(BaseModel):
     text: str | None = None
 
 
-@app.post("/documents")
-async def upload_document(req: DocumentRequest):
+class BatchDocumentItem(BaseModel):
+    """批量上传的单篇文档。"""
+    name: str
+    text: str
+
+
+class BatchDocumentRequest(BaseModel):
+    """批量上传请求：documents 为非空列表，单次上限见 BATCH_MAX_SIZE。"""
+    documents: list[BatchDocumentItem]
+
+
+# 批量上传单次上限：防止单次请求过大撑爆内存（每篇还要走 embed + 入库）
+BATCH_MAX_SIZE = 50
+
+
+async def _upload_single_document(req: DocumentRequest) -> dict:
+    """上传单篇文档的内部实现（POST /documents 与 /documents/batch 共用）。
+
+    返回 {"doc_id": str, "name": str, "chunk_count": int}；
+    文本为空时抛 HTTPException(400)，由调用方按批量场景归入 failed 列表。
+    """
     chunks = chunk_text(req.text, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
     if not chunks:
         raise HTTPException(status_code=400, detail="文档内容为空")
@@ -101,6 +121,49 @@ async def upload_document(req: DocumentRequest):
         "created_at": int(time.time()),
     }
     return {"doc_id": doc_id, "name": req.name, "chunk_count": len(chunks)}
+
+
+@app.post("/documents")
+async def upload_document(req: DocumentRequest):
+    return await _upload_single_document(req)
+
+
+@app.post("/documents/batch")
+async def upload_documents_batch(req: BatchDocumentRequest):
+    """批量上传文档：单篇失败不影响整体，分别记入 uploaded / failed。
+
+    设计要点：
+    - 容错：单篇切片为空 → 记入 failed（带 index/name/error），不抛 500；
+      这样调用方一次能上传多篇而不必重试整批。
+    - 限制：单次最多 BATCH_MAX_SIZE（=50），超限立即 400，防止大请求撑爆内存。
+    - 顺序：uploaded / failed 数组顺序与请求 documents 一致，便于按 index 对账。
+
+    返回结构：
+        {
+          "uploaded": [{"index": 0, "doc_id": "...", "name": "...", "chunk_count": N}, ...],
+          "failed":   [{"index": 2, "name": "...", "error": "..."}, ...]
+        }
+    """
+    if not req.documents:
+        raise HTTPException(status_code=400, detail="documents 列表不能为空")
+    if len(req.documents) > BATCH_MAX_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"批量上传单次最多 {BATCH_MAX_SIZE} 篇，当前 {len(req.documents)} 篇",
+        )
+
+    uploaded: list[dict] = []
+    failed: list[dict] = []
+    for idx, item in enumerate(req.documents):
+        try:
+            result = await _upload_single_document(
+                DocumentRequest(name=item.name, text=item.text)
+            )
+            uploaded.append({"index": idx, **result})
+        except HTTPException as e:
+            failed.append({"index": idx, "name": item.name, "error": e.detail})
+
+    return {"uploaded": uploaded, "failed": failed}
 
 
 @app.post("/query")
@@ -186,14 +249,28 @@ async def update_document(doc_id: str, req: DocumentUpdateRequest):
     new_name = data.get("name", meta["name"])
     new_text = data.get("text")
     if new_text is None:
-        # 仅改 name：仍需重新走一次 delete + re-add 以刷新片段 metadata
-        # 用原 text 重新切片（不影响向量相似度，因为 chunk 内容不变）
-        # 这里用一个最小占位文本触发路径——更直接的做法见下。
-        # 简化：仅当 text 也传了才重新入库；仅改 name 时只更新元数据并提示
-        # 前端"历史片段 metadata 未刷新"。
+        # 仅改 name：必须真正刷新历史 chunk 的 metadata.doc_name（不能只改元数据字典，否则溯源仍指向旧名）
+        # 实现：从向量库取回旧 chunks 的原文 → 删旧 → 重新嵌入 + 入库（新 doc_name）
+        pipeline = get_pipeline()
+        old_ids = [f"{doc_id}:{i}" for i in range(meta["chunk_count"])]
+        old_items = await pipeline.vectorstore.get(old_ids)
+        if len(old_items) != len(old_ids):
+            # 防御：向量库与元数据不一致时拒绝部分更新
+            raise HTTPException(
+                status_code=500,
+                detail=f"chunk 数量不一致：元数据={len(old_ids)} 向量库={len(old_items)}，请走删旧文档再重新上传的流程",
+            )
+        await pipeline.vectorstore.delete(old_ids)
+        for i, item in enumerate(sorted(old_items, key=lambda x: int(x["id"].split(":")[-1]))):
+            text = item["metadata"].get("text", "")
+            vec = await pipeline.embedder.embed(text)
+            await pipeline.vectorstore.add(
+                id=f"{doc_id}:{i}",
+                vector=vec,
+                metadata={"doc_name": new_name, "chunk_index": i, "text": text},
+            )
         meta["name"] = new_name
-        meta["name_stale_in_chunks"] = True
-        return {"doc_id": doc_id, **meta, "warning": "仅修改名称，未刷新历史片段 metadata"}
+        return {"doc_id": doc_id, **meta, "refreshed_chunks": len(old_items)}
 
     # 传了 text：走"删旧 + 入新"标准流程
     chunks = chunk_text(new_text, config.CHUNK_SIZE, config.CHUNK_OVERLAP)

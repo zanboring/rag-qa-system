@@ -55,26 +55,31 @@ class BgeEmbedder(Embedder):
         self.model = SentenceTransformer(model_name)
 
     async def embed(self, text: str) -> list[float]:
-        return self.model.encode(text).tolist()
+        # SentenceTransformer.encode 是同步调用，包 asyncio.to_thread 避免阻塞事件循环
+        import asyncio
+        return await asyncio.to_thread(lambda: self.model.encode(text).tolist())
 
 
 class ZhipuEmbedder(Embedder):
     """智谱云端 Embedding（需 ZHIPU_API_KEY），生产可选。"""
 
     def __init__(self, api_key: str, model: str = "embedding-3"):
+        if not api_key:
+            raise ValueError("使用 zhipu embedding 后端需设置 ZHIPU_API_KEY 环境变量")
         self.api_key = api_key
         self.model = model
+        # 复用连接池：避免每次请求都建立新 TCP 连接
+        self._client = httpx.AsyncClient(timeout=60)
 
     async def embed(self, text: str) -> list[float]:
-        async with httpx.AsyncClient(timeout=60) as client:
-            resp = await client.post(
-                "https://open.bigmodel.cn/api/paas/v4/embeddings",
-                headers={"Authorization": f"Bearer {self.api_key}"},
-                json={"model": self.model, "input": text},
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            return data["data"][0]["embedding"]
+        resp = await self._client.post(
+            "https://open.bigmodel.cn/api/paas/v4/embeddings",
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            json={"model": self.model, "input": text},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data["data"][0]["embedding"]
 
 
 def get_embedder() -> Embedder:

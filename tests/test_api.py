@@ -239,17 +239,26 @@ async def test_update_document_replaces_chunks(client):
 
 
 async def test_update_document_rename_only(client):
-    """只传 name：走"仅元数据更新"路径，返回 warning 标识历史片段未刷新。"""
+    """只传 name：现在走"真刷新 chunk metadata"路径（删旧 + 重新嵌入入库），
+    应返回 refreshed_chunks 字段且历史 chunk 的 doc_name 已更新。"""
     r = await client.post(
         "/documents", json={"name": "原名", "text": "一些文本内容用于检索验证" * 10}
     )
     doc_id = r.json()["doc_id"]
+    original_chunk_count = r.json()["chunk_count"]
 
     r2 = await client.put(f"/documents/{doc_id}", json={"name": "新名"})
     assert r2.status_code == 200
     data = r2.json()
     assert data["name"] == "新名"
-    assert data.get("warning")  # 提示历史片段 metadata 未刷新
+    assert data.get("refreshed_chunks") == original_chunk_count  # 所有历史 chunk 都已用新名重建
+
+    # 二次查询，溯源应显示新名
+    r3 = await client.post("/query", json={"question": "检索验证", "top_k": 3})
+    assert r3.status_code == 200
+    sources = r3.json().get("sources", [])
+    assert sources, "查询应至少命中一条"
+    assert all(s.get("doc_name") == "新名" for s in sources)
 
 
 async def test_update_document_validation(client):
@@ -266,3 +275,171 @@ async def test_update_document_validation(client):
     # 不存在的 doc_id → 404
     r_404 = await client.put("/documents/nonexistent-id-xyz", json={"name": "X"})
     assert r_404.status_code == 404
+
+
+# ---------- 批量上传 ----------
+
+async def test_batch_upload_multiple_documents(client):
+    """POST /documents/batch 一次性传多篇，应全部进 uploaded 列表。"""
+    r = await client.post(
+        "/documents/batch",
+        json={
+            "documents": [
+                {"name": "文档甲", "text": "甲主题内容独门标识符甲甲甲甲甲甲甲甲甲" * 5},
+                {"name": "文档乙", "text": "乙主题内容独门标识符乙乙乙乙乙乙乙乙乙" * 5},
+                {"name": "文档丙", "text": "丙主题内容独门标识符丙丙丙丙丙丙丙丙丙" * 5},
+            ]
+        },
+    )
+    assert r.status_code == 200
+    data = r.json()
+    # 全部成功，failed 应为空
+    assert len(data["uploaded"]) == 3
+    assert data["failed"] == []
+
+    # uploaded 每条都带 index / doc_id / name / chunk_count
+    for i, item in enumerate(data["uploaded"]):
+        assert item["index"] == i
+        assert item["doc_id"]
+        assert item["name"] == f"文档{['甲', '乙', '丙'][i]}"
+        assert item["chunk_count"] >= 1
+
+    # 文档列表应有 3 篇
+    listing = await client.get("/documents")
+    assert listing.json()["total"] == 3
+
+
+async def test_batch_upload_single_document(client):
+    """批量上传单篇文档应等价于单条上传（结构不变）。"""
+    r = await client.post(
+        "/documents/batch",
+        json={"documents": [{"name": "单篇", "text": "单独一篇的内容用于验证" * 10}]},
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert len(data["uploaded"]) == 1
+    assert data["failed"] == []
+    assert data["uploaded"][0]["index"] == 0
+    assert data["uploaded"][0]["name"] == "单篇"
+
+
+async def test_batch_upload_partial_failure(client):
+    """批量上传时部分文档为空文本 → 记入 failed，已成功的进 uploaded，整体仍 200。"""
+    r = await client.post(
+        "/documents/batch",
+        json={
+            "documents": [
+                {"name": "正常的", "text": "正常内容独门标识符丁" * 10},
+                {"name": "空文本", "text": "   "},  # 切片后为空 → 400
+                {"name": "也正常", "text": "另一篇正常内容独门标识符戊" * 10},
+            ]
+        },
+    )
+    assert r.status_code == 200
+    data = r.json()
+    # 2 篇成功，1 篇失败
+    assert len(data["uploaded"]) == 2
+    assert len(data["failed"]) == 1
+    # failed 记录了 index/name/error
+    fail_item = data["failed"][0]
+    assert fail_item["index"] == 1
+    assert fail_item["name"] == "空文本"
+    assert "空" in fail_item["error"]
+    # uploaded 顺序对应原数组下标
+    assert data["uploaded"][0]["index"] == 0
+    assert data["uploaded"][1]["index"] == 2
+
+    # 文档列表只有 2 篇（失败的没入库）
+    listing = await client.get("/documents")
+    assert listing.json()["total"] == 2
+
+
+async def test_batch_upload_empty_list_rejected(client):
+    """空 documents 列表 → 400（不允许「零上传」当成成功）。"""
+    r = await client.post("/documents/batch", json={"documents": []})
+    assert r.status_code == 400
+
+
+async def test_batch_upload_exceeds_limit_rejected(client):
+    """超过 BATCH_MAX_SIZE → 400，超限整批拒绝（不部分入库）。"""
+    docs = [{"name": f"d{i}", "text": "x" * 100} for i in range(51)]  # BATCH_MAX_SIZE=50
+    r = await client.post("/documents/batch", json={"documents": docs})
+    assert r.status_code == 400
+    assert "50" in r.json()["detail"]
+    # 整批拒绝：文档表应为空
+    listing = await client.get("/documents")
+    assert listing.json()["total"] == 0
+
+
+# ---------- 来源片段：置信度 + 高亮 ----------
+
+async def test_query_returns_confidence_and_highlight(client):
+    """每条 source 应包含 confidence（相对归一化），snippet 应高亮查询关键词。"""
+    r = await client.post(
+        "/documents",
+        json={
+            "name": "排序算法笔记.md",
+            "text": (
+                "快速排序是一种分治算法。快速排序平均时间复杂度是 O(n log n)，"
+                "最坏情况下退化到 O(n^2)。归并排序也是分治，但稳定性更好。"
+            ),
+        },
+    )
+    assert r.status_code == 200
+
+    q = await client.post("/query", json={"question": "快速排序的时间复杂度"})
+    assert q.status_code == 200
+    data = q.json()
+
+    # 顶层聚合字段存在
+    assert "confidence_avg" in data
+    assert "top_score" in data
+
+    # sources 每条必须有 confidence 字段
+    assert len(data["sources"]) >= 1
+    for src in data["sources"]:
+        assert "confidence" in src
+        assert isinstance(src["confidence"], (int, float))
+        assert 0.0 <= src["confidence"] <= 1.0
+        assert "snippet" in src
+
+    # 关键：「快速排序」应在 snippet 中被 ** 包裹（高亮）
+    snippet = data["sources"][0]["snippet"]
+    assert "**快速排序**" in snippet
+
+
+async def test_query_confidence_distribution(client):
+    """confidence 之和应 ≈ 1（相对归一化）。"""
+    await client.post(
+        "/documents",
+        json={
+            "name": "排序笔记.md",
+            "text": "冒泡排序、选择排序、插入排序、快速排序都是基础排序算法。" * 5,
+        },
+    )
+    await client.post(
+        "/documents",
+        json={
+            "name": "图论笔记.md",
+            "text": "图论研究节点与边的关系，与排序算法无关。" * 5,
+        },
+    )
+    q = await client.post("/query", json={"question": "排序算法有哪些", "top_k": 2})
+    assert q.status_code == 200
+    data = q.json()
+    total_conf = sum(src["confidence"] for src in data["sources"])
+    # confidence 是 score/sum(scores)，总和 = 1（容差 0.01）
+    assert abs(total_conf - 1.0) < 0.01
+
+
+async def test_query_highlight_case_insensitive(client):
+    """高亮应大小写不敏感（query 中用大写也应命中 snippet 中小写词）。"""
+    await client.post(
+        "/documents",
+        json={"name": "PY指南.md", "text": "Python 是一种解释型语言，Python 支持多范式。" * 5},
+    )
+    # query 中用大写 Python（实际 chunk 中是小写）
+    q = await client.post("/query", json={"question": "Python 的特点"})
+    snippet = q.json()["sources"][0]["snippet"]
+    # 大小写不敏感匹配后应有 **
+    assert "**Python**" in snippet

@@ -22,6 +22,13 @@ class VectorStore:
         """删除指定 id 的向量，返回实际删除数量。"""
         raise NotImplementedError
 
+    async def get(self, ids: list[str]) -> list[dict]:
+        """按 id 批量取回 {vector, metadata}，用于改名/重建索引时获取原文。
+
+        关键修复：旧版没有 get，导致 PUT 改 name 时无法刷新历史 chunk 的 metadata.doc_name。
+        """
+        raise NotImplementedError
+
 
 def _cosine(a: list[float], b: list[float]) -> float:
     """余弦相似度：值域 [-1, 1]，越接近 1 越相似。"""
@@ -44,7 +51,9 @@ class MemoryVectorStore(VectorStore):
         scored = []
         for id, item in self._items.items():
             score = _cosine(vector, item["vector"])
-            scored.append((score, id, item["metadata"]))
+            # 过滤负相似度：语义反向的片段对回答无帮助，不应出现在 Top-K 中
+            if score > 0:
+                scored.append((score, id, item["metadata"]))
         scored.sort(key=lambda x: x[0], reverse=True)
         return [
             {"id": id, "score": score, "metadata": meta}
@@ -58,6 +67,13 @@ class MemoryVectorStore(VectorStore):
                 del self._items[id]
                 removed += 1
         return removed
+
+    async def get(self, ids: list[str]) -> list[dict]:
+        """取回指定 id 的 {vector, metadata}，保持原顺序；不存在的 id 跳过。"""
+        return [
+            {"id": id, "vector": self._items[id]["vector"], "metadata": self._items[id]["metadata"]}
+            for id in ids if id in self._items
+        ]
 
     def __len__(self) -> int:
         return len(self._items)
@@ -96,6 +112,18 @@ class ChromaVectorStore(VectorStore):
             return 0
         self.collection.delete(ids=ids)
         return len(ids)
+
+    async def get(self, ids: list[str]) -> list[dict]:
+        """从 Chroma 取回 {vector, metadata}。include 必须带 embeddings 才能拿到向量。"""
+        if not ids:
+            return []
+        res = self.collection.get(ids=ids, include=["embeddings", "metadatas"])
+        out = []
+        for id, emb, meta in zip(
+            res.get("ids", []), res.get("embeddings", []), res.get("metadatas", [])
+        ):
+            out.append({"id": id, "vector": emb, "metadata": meta})
+        return out
 
 
 def get_vectorstore() -> VectorStore:

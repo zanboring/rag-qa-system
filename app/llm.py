@@ -30,46 +30,50 @@ class OllamaLLM(LLM):
     def __init__(self, base_url: str, model: str):
         self.base_url = base_url
         self.model = model
+        # 复用连接池
+        self._client = httpx.AsyncClient(timeout=120)
 
     async def generate(self, system: str, prompt: str) -> str:
-        async with httpx.AsyncClient(timeout=120) as client:
-            resp = await client.post(
-                f"{self.base_url}/api/chat",
-                json={
-                    "model": self.model,
-                    "messages": [
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": prompt},
-                    ],
-                    "stream": False,
-                },
-            )
-            resp.raise_for_status()
-            return resp.json()["message"]["content"]
+        resp = await self._client.post(
+            f"{self.base_url}/api/chat",
+            json={
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+                "stream": False,
+            },
+        )
+        resp.raise_for_status()
+        return resp.json()["message"]["content"]
 
 
 class GLM4LLM(LLM):
     """智谱 GLM-4 云端模型（兼容 OpenAI 协议，需 ZHIPU_API_KEY）。"""
 
     def __init__(self, api_key: str, model: str = "glm-4-flash"):
+        if not api_key:
+            raise ValueError("使用 glm4 后端需设置 ZHIPU_API_KEY 环境变量")
         self.api_key = api_key
         self.model = model
+        # 复用连接池
+        self._client = httpx.AsyncClient(timeout=120)
 
     async def generate(self, system: str, prompt: str) -> str:
-        async with httpx.AsyncClient(timeout=120) as client:
-            resp = await client.post(
-                "https://open.bigmodel.cn/api/paas/v4/chat/completions",
-                headers={"Authorization": f"Bearer {self.api_key}"},
-                json={
-                    "model": self.model,
-                    "messages": [
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": prompt},
-                    ],
-                },
-            )
-            resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
+        resp = await self._client.post(
+            "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            json={
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+            },
+        )
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
 
 
 def get_llm() -> LLM:

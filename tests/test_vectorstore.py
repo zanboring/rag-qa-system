@@ -28,6 +28,23 @@ def test_add_and_search_topk():
     asyncio.run(run())
 
 
+def test_search_filters_negative_score():
+    """语义反向的片段（余弦相似度<=0）不应出现在结果中。"""
+    store = MemoryVectorStore()
+    e = HashEmbedder(dim=128)
+
+    async def run():
+        # 只入库一条
+        await store.add("a", await e.embed("人工智能"), {"text": "AI"})
+        # 检索时 top_k=10 远大于数据量，应只返回 1 条（而非报错）
+        hits = await store.search(await e.embed("人工智能"), top_k=10)
+        assert len(hits) == 1
+        assert hits[0]["id"] == "a"
+        assert hits[0]["score"] > 0  # 正相似度
+
+    asyncio.run(run())
+
+
 def test_search_empty_store():
     store = MemoryVectorStore()
     e = HashEmbedder(dim=128)
