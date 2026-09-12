@@ -51,7 +51,7 @@ curl http://localhost:8000/health
 
 ```bash
 cp .env.example .env
-# 编辑 .env：设置 LLM_BACKEND=glm4 与 ZHIPU_API_KEY
+# 编辑 .env：设置 LLM_BACKEND=deepseek 与 DEEPSEEK_API_KEY
 docker compose up -d --build
 ```
 
@@ -168,19 +168,94 @@ hash4096 不开重排（MRR 0.779）已经明显超过 hash256 开重排（MRR 0
 > **报告指标时必须标明所用后端**，否则"Hit@5 = 0.58"会被误读成"这个系统的检索能力"，
 > 而它实际上只是"某一个 embedding 后端的检索能力"。
 
+### 真实模型下的生成与拒答
+
+上面的检索指标用 mock 生成就能测出来——检索发生在生成之前，与 LLM 后端无关。
+但**生成质量与拒答能力必须接真实模型**才测得到：
+
+```bash
+python -m eval.run_eval --llm deepseek --tag deepseek
+```
+
+**生成质量**（DeepSeek 生成 + DeepSeek 裁判，50 条有答案样本）：
+
+| 配置 | 关键词覆盖 | 上下文覆盖 | 忠实度 | 答案相关性 |
+| --- | --- | --- | --- | --- |
+| hash256，无重排 | 0.6533 | 0.6733 | 0.9760 | 0.9600 |
+| hash256，重排 | 0.7800 | 0.7933 | 0.9850 | 0.9790 |
+| hash4096，无重排 | 0.9183 | 0.9533 | 0.9910 | 0.9890 |
+| **hash4096，重排** | **0.9567** | **0.9933** | **0.9960** | **0.9970** |
+
+**拒答能力**（4 条无答案样本）：
+
+| 配置 | 正确拒答率 | 误拒率 | P50 延迟 | P95 延迟 |
+| --- | --- | --- | --- | --- |
+| hash256，无重排 | 1.0000 | 0.3600 | 1277 ms | 2026 ms |
+| hash256，重排 | 1.0000 | 0.2400 | 1268 ms | 1937 ms |
+| hash4096，无重排 | 1.0000 | 0.0600 | 1308 ms | 2168 ms |
+| **hash4096，重排** | 1.0000 | **0.0200** | 1379 ms | 2301 ms |
+
+三个值得讲的发现：
+
+**1. 模型确实会拒答，且不编造。**
+正确拒答率稳定在 100%——面对知识库里确实没有答案的问题，DeepSeek 每次都明确说明
+「资料中未找到相关信息」，而不是编一个看起来合理的答案。忠实度 0.99+ 也印证了这点：
+答案几乎全部由检索到的上下文支撑。
+
+**2. 误拒率是检索质量的投影，而不是模型态度问题。**
+误拒率从 hash256 的 36% 降到 hash4096+重排的 **2%**，且随检索质量单调下降。原因链条很清晰：
+
+    检索没召回正确片段 → 上下文里根本没有答案 → 模型"诚实地"说资料不足
+    → 系统把它记为「错误拒答」
+
+**这些拒答在模型的视角里是正确的，但对用户是失败体验。**
+所以调拒答不能只改提示词——检索召回不上来，提示词调得再好也没用。
+这是「拒答问题往往就是检索问题」的一个具体例证，而只看拒答率数字是看不出来的。
+
+**3. mock 与真实模型的差距，正是引入真实评测的理由。**
+同一套检索结果下对比两种生成后端：
+
+| 指标 | mock 生成 | DeepSeek 生成 |
+| --- | --- | --- |
+| 关键词覆盖 | 0.13 | **0.96** |
+| 忠实度 | n/a（不适用） | **0.99** |
+
+mock 的输出是固定模板，关键词覆盖天然接近 0。若不接真实模型，
+这份报告会得出"系统答不对问题"的结论——而真实情况只是"mock 不会答题"。
+
+> **裁判偏差说明**：本次生成与裁判都用了 DeepSeek，存在**自我偏好偏差**
+> （模型倾向于给自家输出更高分）。因此忠实度 0.99+ 应视为**上界**，绝对值需保守看待；
+> 跨模型比较（例如换个模型给同一批答案打分）才更可靠。
+> 报告里记录裁判模型名（`llm:deepseek-chat`）的原因正在于此——
+> 不同裁判打出的分数不可直接比较。
+
+> **可复现性说明**：两类指标的稳定性不同，不能一概而论。
+>
+> - **检索指标是确定性的**：hash embedding 无随机性，检索过程也无随机性。
+>   已用两次独立运行验证，四组配置的 Hit/MRR/nDCG **逐位完全一致**。
+> - **生成指标会波动**：LLM 采样带随机性，同一批问题的关键词覆盖、忠实度、
+>   误拒率存在 ±0.02 量级的抖动（两次运行中误拒率分别为 0% 与 2%）。
+>   因此生成指标的绝对值**不应被当作精确值**，有意义的是配置之间的**相对趋势**；
+>   需要精确比较时应固定 temperature 并多次运行取均值。
+>
+> 把这一点写进文档，是因为"评测结果可复现"是有边界的：
+> 检索侧可以做到逐位复现，生成侧只能保证趋势可复现。
+> 混为一谈会让人对生成指标过度信任。
+
 ### 怎么复现
 
 ```bash
 python -m eval.validate_set                       # 第一步：先自检评测集
-python -m eval.run_eval                           # 跑基线，自动对比重排开关
-python -m eval.run_eval --hash-dims 256,4096      # 对比哈希维度（表示能力）的影响
+python -m eval.run_eval --judge rule              # 零成本跑基线（纯检索，不调 LLM）
+python -m eval.run_eval --hash-dims 256,4096 --judge rule   # 对比哈希维度（表示能力）
 python -m eval.run_eval --embedding bge           # 换 BGE（需 pip install sentence-transformers）
-python -m eval.run_eval --llm glm4                # 接真实模型，产出忠实度等指标
+python -m eval.run_eval --llm deepseek --tag deepseek   # 接真实模型，产出忠实度等指标
+                                                       # --tag 让结果写入 report_deepseek.md，不覆盖基线
 ```
 
 产出：`eval/results/report.md`（汇总报告）、`detail_*.json`（逐样本明细）。 
 
-**关于裁判**：未配置 `JUDGE_API_KEY` / `ZHIPU_API_KEY` 时自动降级为规则裁判，
+**关于裁判**：未配置 `JUDGE_API_KEY` / `DEEPSEEK_API_KEY` / `ZHIPU_API_KEY` 时自动降级为规则裁判，
 此时忠实度与答案相关性显示为 `n/a`。这是刻意的——这两项需要语义理解，
 用关键词规则冒充会得出看似合理、实则误导的数字，**宁可不报也不报假的**。
 
@@ -236,10 +311,11 @@ python -m eval.run_eval --llm glm4                # 接真实模型，产出忠�
 | --- | --- | --- |
 | `EMBEDDING_BACKEND` | `hash` | `hash`（零依赖）/ `bge`（本地）/ `zhipu`（云端） |
 | `VECTOR_BACKEND` | `memory` | `memory`（内存）/ `chroma`（需额外安装） |
-| `LLM_BACKEND` | `mock` | `mock`（假模型）/ `ollama`（本地）/ `glm4`（云端） |
+| `LLM_BACKEND` | `mock` | `mock`（假模型）/ `ollama`（本地）/ `deepseek`（云端）/ `glm4`（云端） |
 | `CHUNK_SIZE` / `CHUNK_OVERLAP` | `500` / `50` | 切片粒度 |
 | `CHROMA_PATH` | 空 | 向量库落盘路径，**留空则重启丢数据** |
-| `ZHIPU_API_KEY` | 空 | 使用 `glm4` / `zhipu` 后端时必填 |
+| `DEEPSEEK_API_KEY` | 空 | 使用 `deepseek` 后端或作为评测裁判时必填 |
+| `ZHIPU_API_KEY` | 空 | 使用 `glm4` / `zhipu` 后端时必填（兼容 `ZHIPUAI_API_KEY`） |
 
 启用 ChromaDB 持久化：
 
@@ -266,7 +342,7 @@ export CHROMA_PATH=./chroma_db
 ### 上线检查清单
 
 - [ ] `VECTOR_BACKEND=chroma` 且 `CHROMA_PATH` 指向挂载卷
-- [ ] `ZHIPU_API_KEY` 通过环境变量注入，**不写进镜像、不提交仓库**
+- [ ] `DEEPSEEK_API_KEY` 等密钥通过环境变量注入，**不写进镜像、不提交仓库**
 - [ ] `curl /health` 确认 `backends` 与 `vector_persistent` 符合预期
 - [ ] 用 `python -m eval.run_eval` 跑一次评测，留存基线指标
 - [ ] 按实际语料量评估：内存向量库的暴力检索在 10 万片段内够用，超出需换 ANN 索引

@@ -2,22 +2,25 @@
 
 用法
 ----
-    # 零依赖跑基线（hash embedding + mock 生成），对比重排开关
-    python -m eval.run_eval
+    # 零依赖跑基线（规则裁判，不消耗任何 API 调用），同时对比重排与哈希维度
+    python -m eval.run_eval --judge rule --hash-dims 256,4096
 
     # 换成 BGE embedding（需 pip install sentence-transformers）
-    python -m eval.run_eval --embedding hash,bge
+    python -m eval.run_eval --embedding hash,bge --judge rule
 
-    # 接真实模型跑生成指标（需 ZHIPU_API_KEY，或用 Ollama 的 OpenAI 兼容接口）
-    python -m eval.run_eval --llm glm4
+    # 接真实模型跑生成指标（需 DEEPSEEK_API_KEY；裁判也会自动复用 DeepSeek）
+    python -m eval.run_eval --llm deepseek --tag deepseek
 
     # 调整召回条数与并发
     python -m eval.run_eval --top-k 5 --concurrency 8
 
 产出
 ----
-    eval/results/report.md           汇总报告（指标对比表 + 失败案例分析）
+    eval/results/report[_<tag>].md   汇总报告（指标对比表 + 自动诊断 + 失败案例）
     eval/results/detail_<配置>.json  逐样本明细，便于定位单条失败
+
+    --tag 用于区分不同后端的评测结果（如 report.md 为 mock 基线、
+    report_deepseek.md 为真实模型），避免后跑的覆盖先跑的。
 
 评测流程
 --------
@@ -57,7 +60,7 @@ from app.rag import RAGPipeline
 from app.vectorstore import get_vectorstore
 
 from eval import metrics as M
-from eval.judge import get_judge
+from eval.judge import RuleBasedJudge, get_judge
 from eval.validate_set import load_corpus, load_golden_set, print_summary, validate
 
 EVAL_DIR = Path(__file__).resolve().parent
@@ -288,10 +291,13 @@ RETRIEVAL_KEYS = (
 RULE_GEN_KEYS = ("keyword_coverage", "context_recall")
 
 
-def summarize(rows: list[SampleResult]) -> dict:
+def summarize(rows: list[SampleResult], llm_backend: str = "") -> dict:
     """把逐样本明细聚合为总体指标。
 
     三类指标分别聚合，且如实标注哪些指标在当前环境下没有数据（值为 None）。
+
+    参数 llm_backend 用于判断生成类指标是否成立：mock 后端不产生真实答案，
+    它对应的忠实度 / 相关性 / 拒答指标一律标为不可用。
     """
     answerable = [r for r in rows if not r.is_unanswerable]
     unanswerable = [r for r in rows if r.is_unanswerable]
@@ -308,18 +314,23 @@ def summarize(rows: list[SampleResult]) -> dict:
     for key in RULE_GEN_KEYS:
         summary[key] = round(M.average(getattr(r, key) for r in answerable), 4)
 
-    # 裁判指标：只在真正产出分数时统计，避免用 0 冒充"评分为零"
-    for key in ("faithfulness", "answer_relevancy"):
-        values = [getattr(r, key) for r in answerable if getattr(r, key) is not None]
-        summary[key] = round(M.average(values), 4) if values else None
-
-    # mock 后端比例。mock LLM 不产生真实答案，因此生成指标与拒答指标在 mock 下都没有意义：
-    # 答案不构成"作答"也不构成"拒答"。必须显式识别并标注，否则会得出
-    # "正确拒答率 1.0 且误拒率 1.0" 这种自相矛盾的数字。
+    # 生成类指标是否可用。
+    #
+    # 判断依据是「配置里的 llm 后端」，而不是让裁判去识别 mock 输出。
+    # 原因：接入真实裁判（如 DeepSeek）后，mock 的模板答案会被裁判判为"未作答"，
+    # 于是误拒率飙到 90%+，结论会变成"系统拒答能力有问题"——
+    # 但真正的问题是"测量对象本身不成立"（mock 压根不产生答案）。
+    # 只看输出、不看配置，就会把"没测到"误读成"测出来不好"。
     mock_ratio = M.average(1.0 if r.judge_error == "mock_backend" else 0.0 for r in rows)
     summary["mock_backend_ratio"] = round(mock_ratio, 4)
-    generation_ok = mock_ratio < 0.5
+    generation_ok = llm_backend != "mock" and mock_ratio < 0.5
     summary["generation_metrics_available"] = generation_ok
+
+    # 裁判指标：只在真正产出分数、且生成后端真实时统计，
+    # 既不拿 0 冒充"评分为零"，也不拿 mock 的分数冒充生成质量
+    for key in ("faithfulness", "answer_relevancy"):
+        values = [getattr(r, key) for r in answerable if getattr(r, key) is not None]
+        summary[key] = round(M.average(values), 4) if (values and generation_ok) else None
 
     # 拒答指标：无答案样本上正确拒答的比例
     if unanswerable and generation_ok:
@@ -472,7 +483,7 @@ def build_report(results: list[dict], judge_name: str, corpus_size: int) -> str:
                      "「mock 不能答题」，**不代表检索或系统质量差**。")
         lines.append("> 同理，这些配置下的拒答指标显示为 `n/a`："
                      "mock 的答案既不构成作答、也不构成拒答，无法用于评判拒答能力。")
-        lines.append("> 这部分结论需在接入真实生成后端（`--llm glm4` 或 `--llm ollama`）后重新评测。")
+        lines.append("> 这部分结论需在接入真实生成后端（`--llm deepseek` / `--llm ollama`）后重新评测。")
         lines.append("")
 
     # ---------- 拒答指标 ----------
@@ -572,7 +583,10 @@ async def main_async(args: argparse.Namespace) -> int:
                     )
                 )
 
-    judge = get_judge()
+    # --judge rule 强制使用零依赖规则裁判。
+    # 用途：纯检索评测（调切片、调 top_k、对比 embedding）不需要裁判，
+    # 强制规则裁判可以在不消耗任何 API 调用的情况下复现检索指标。
+    judge = RuleBasedJudge() if args.judge == "rule" else get_judge()
     print(f"裁判后端：{judge.name}")
     print(f"待评测配置：{[c.label for c in configs]}\n")
 
@@ -586,10 +600,11 @@ async def main_async(args: argparse.Namespace) -> int:
             )
             elapsed = time.perf_counter() - started
 
-            summary = summarize(rows)
+            summary = summarize(rows, cfg.llm)
             results.append(
                 {
                     "config": cfg.label,
+                    "llm_backend": cfg.llm,
                     "config_detail": asdict(cfg),
                     "summary": summary,
                     "rows": [asdict(r) for r in rows],
@@ -614,11 +629,12 @@ async def main_async(args: argparse.Namespace) -> int:
             json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
+    suffix = f"_{args.tag}" if args.tag else ""
     report = build_report(results, judge.name, len(corpus))
-    report_path = RESULTS_DIR / "report.md"
+    report_path = RESULTS_DIR / f"report{suffix}.md"
     report_path.write_text(report, encoding="utf-8")
 
-    summary_path = RESULTS_DIR / "summary.json"
+    summary_path = RESULTS_DIR / f"summary{suffix}.json"
     summary_path.write_text(
         json.dumps(
             [{k: v for k, v in res.items() if k != "rows"} for res in results],
@@ -641,7 +657,9 @@ def parse_args() -> argparse.Namespace:
         help="embedding 后端，逗号分隔（hash / bge / zhipu），默认 hash",
     )
     parser.add_argument("--vector", default="memory", help="向量库后端（memory / chroma）")
-    parser.add_argument("--llm", default="mock", help="生成后端（mock / ollama / glm4）")
+    parser.add_argument(
+        "--llm", default="mock", help="生成后端（mock / ollama / deepseek / glm4）"
+    )
     parser.add_argument(
         "--rerank",
         default="both",
@@ -657,6 +675,19 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--top-k", type=int, default=DEFAULT_TOP_K, dest="top_k")
     parser.add_argument("--concurrency", type=int, default=4, help="样本并发数")
+    parser.add_argument(
+        "--tag",
+        default="",
+        help="输出文件名后缀（如 --tag deepseek 会写出 report_deepseek.md）。"
+             "用于同时保留多组不同后端的评测结果，避免后跑的覆盖先跑的",
+    )
+    parser.add_argument(
+        "--judge",
+        default="auto",
+        choices=("auto", "rule"),
+        help="裁判后端。auto 按环境变量自动选择；rule 强制使用零依赖规则裁判，"
+             "适合只关心检索指标的评测，不消耗 API 调用",
+    )
     return parser.parse_args()
 
 

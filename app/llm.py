@@ -1,9 +1,16 @@
-"""大模型调用：mock / Ollama / GLM-4 可切换。
+"""大模型调用：mock / Ollama / DeepSeek / GLM-4 可切换。
 
 面试可讲点：
 - RAG 的「生成」环节调用 LLM，把检索到的上下文拼进 Prompt 再生成答案。
-- 本项目默认 mock（确定性假模型，便于单测与离线演示），
-  生产切 Ollama 本地模型或 GLM-4 云端模型，改环境变量即可。
+- 本项目默认 mock（确定性假模型，便于单测与离线演示），生产改环境变量即可切换：
+    LLM_BACKEND=mock      零依赖假模型，用于单测与链路验证
+    LLM_BACKEND=ollama    本地模型，数据不出本地（需 ollama serve）
+    LLM_BACKEND=deepseek  DeepSeek 云端（OpenAI 兼容，需 DEEPSEEK_API_KEY）
+    LLM_BACKEND=glm4      智谱 GLM-4 云端（OpenAI 兼容，需 ZHIPU_API_KEY）
+
+关于可插拔的设计取舍：云端厂商虽然各异，但绝大多数都实现了 OpenAI 兼容协议，
+因此用一个 OpenAICompatLLM 覆盖，而不是每个厂商复制一份请求逻辑；
+协议确实不同的（如 Ollama 原生接口）才单独实现。
 """
 
 import httpx
@@ -60,23 +67,44 @@ class OllamaLLM(LLM):
         return resp.json()["message"]["content"]
 
 
-class GLM4LLM(LLM):
-    """智谱 GLM-4 云端模型（兼容 OpenAI 协议，需 ZHIPU_API_KEY）。"""
+class OpenAICompatLLM(LLM):
+    """任何实现 OpenAI 兼容协议的云端模型（DeepSeek / 智谱 GLM-4 / 其它网关）。
 
-    def __init__(self, api_key: str, model: str = "glm-4-flash"):
+    为什么不给每个厂商写一个类：DeepSeek、智谱 GLM-4 以及大多数国产模型服务
+    都实现了 OpenAI 的接口协议——请求体是 `messages` 数组，响应体取
+    `choices[0].message.content`。差异只收敛在三个参数上：base_url / api_key / model。
+    抽出一个实现，新增后端就只是加一行配置映射，而不是复制一整段请求代码。
+
+    与之相对，Ollama 的原生 `/api/chat` 协议不同（响应取 `message.content`），
+    因此保留独立的实现，不用一个类去兼容两种协议。
+    """
+
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        model: str,
+        provider: str,
+        timeout: float = 120.0,
+    ):
         if not api_key:
-            raise ValueError("使用 glm4 后端需设置 ZHIPU_API_KEY 环境变量")
+            raise ValueError(
+                f"使用 {provider} 后端需先设置对应的 API Key 环境变量"
+                f"（如 {provider.upper()}_API_KEY）"
+            )
+        self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
-        # 复用连接池
-        self._client = httpx.AsyncClient(timeout=120)
+        self.provider = provider
+        # 复用连接池：避免每次请求都重新建连与 TLS 握手
+        self._client = httpx.AsyncClient(timeout=timeout)
 
     async def aclose(self) -> None:
         await self._client.aclose()
 
     async def generate(self, system: str, prompt: str) -> str:
         resp = await self._client.post(
-            "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+            f"{self.base_url}/chat/completions",
             headers={"Authorization": f"Bearer {self.api_key}"},
             json={
                 "model": self.model,
@@ -91,8 +119,25 @@ class GLM4LLM(LLM):
 
 
 def get_llm() -> LLM:
+    """按 LLM_BACKEND 返回生成后端。
+
+    deepseek / glm4 走同一套 OpenAI 兼容实现，ollama 用自己的原生协议，
+    mock 用于零依赖离线测试。
+    """
+    if config.LLM_BACKEND == "deepseek":
+        return OpenAICompatLLM(
+            config.DEEPSEEK_BASE_URL,
+            config.DEEPSEEK_API_KEY,
+            config.DEEPSEEK_CHAT_MODEL,
+            provider="deepseek",
+        )
+    if config.LLM_BACKEND == "glm4":
+        return OpenAICompatLLM(
+            config.ZHIPU_BASE_URL,
+            config.ZHIPU_API_KEY,
+            config.ZHIPU_CHAT_MODEL,
+            provider="glm4",
+        )
     if config.LLM_BACKEND == "ollama":
         return OllamaLLM(config.OLLAMA_BASE_URL, config.OLLAMA_MODEL)
-    if config.LLM_BACKEND == "glm4":
-        return GLM4LLM(config.ZHIPU_API_KEY, config.ZHIPU_CHAT_MODEL)
     return MockLLM()

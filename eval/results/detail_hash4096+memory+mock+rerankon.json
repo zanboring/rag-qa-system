@@ -1,5 +1,6 @@
 {
   "config": "hash4096+memory+mock+rerankon",
+  "llm_backend": "mock",
   "config_detail": {
     "embedding": "hash",
     "vector": "memory",
@@ -22,14 +23,14 @@
     "ndcg_at_5": 0.8576,
     "keyword_coverage": 0.1317,
     "context_recall": 0.9933,
-    "faithfulness": null,
-    "answer_relevancy": null,
     "mock_backend_ratio": 1.0,
     "generation_metrics_available": false,
+    "faithfulness": null,
+    "answer_relevancy": null,
     "abstention_accuracy": null,
     "false_abstention_rate": null,
-    "latency_p50_ms": 31.69,
-    "latency_p95_ms": 35.09
+    "latency_p50_ms": 38.69,
+    "latency_p95_ms": 50.74
   },
   "rows": [
     {
@@ -69,7 +70,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.88
+      "latency_ms": 49.12
     },
     {
       "id": "q02",
@@ -108,7 +109,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.34
+      "latency_ms": 49.12
     },
     {
       "id": "q03",
@@ -147,7 +148,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.84
+      "latency_ms": 45.18
     },
     {
       "id": "q04",
@@ -186,7 +187,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.74
+      "latency_ms": 50.82
     },
     {
       "id": "q05",
@@ -225,7 +226,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.79
+      "latency_ms": 44.87
     },
     {
       "id": "q06",
@@ -264,7 +265,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.67
+      "latency_ms": 50.03
     },
     {
       "id": "q07",
@@ -303,7 +304,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.48
+      "latency_ms": 50.31
     },
     {
       "id": "q08",
@@ -342,7 +343,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.39
+      "latency_ms": 50.04
     },
     {
       "id": "q09",
@@ -381,7 +382,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 33.6
+      "latency_ms": 50.55
     },
     {
       "id": "q10",
@@ -420,7 +421,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.18
+      "latency_ms": 50.59
     },
     {
       "id": "q11",
@@ -459,7 +460,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.13
+      "latency_ms": 50.41
     },
     {
       "id": "q12",
@@ -498,7 +499,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.55
+      "latency_ms": 47.01
     },
     {
       "id": "q13",
@@ -537,7 +538,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.52
+      "latency_ms": 50.17
     },
     {
       "id": "q14",
@@ -576,7 +577,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.68
+      "latency_ms": 50.25
     },
     {
       "id": "q15",
@@ -615,7 +616,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.52
+      "latency_ms": 49.96
     },
     {
       "id": "q16",
@@ -654,7 +655,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.69
+      "latency_ms": 50.34
     },
     {
       "id": "q17",
@@ -693,7 +694,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.62
+      "latency_ms": 44.75
     },
     {
       "id": "q18",
@@ -732,7 +733,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.09
+      "latency_ms": 36.94
     },
     {
       "id": "q19",
@@ -771,7 +772,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.38
+      "latency_ms": 37.11
     },
     {
       "id": "q20",
@@ -810,7 +811,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.84
+      "latency_ms": 36.65
     },
     {
       "id": "q21",
@@ -849,7 +850,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.97
+      "latency_ms": 36.6
     },
     {
       "id": "q22",
@@ -888,7 +889,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.21
+      "latency_ms": 36.6
     },
     {
       "id": "q23",
@@ -927,7 +928,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 37.77
+      "latency_ms": 36.76
     },
     {
       "id": "q24",
@@ -966,7 +967,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.28
+      "latency_ms": 37.83
     },
     {
       "id": "q25",
@@ -1005,7 +1006,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.77
+      "latency_ms": 34.93
     },
     {
       "id": "q26",
@@ -1044,7 +1045,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.31
+      "latency_ms": 36.94
     },
     {
       "id": "q27",
@@ -1083,7 +1084,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 33.19
+      "latency_ms": 36.03
     },
     {
       "id": "q28",
@@ -1122,7 +1123,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.8
+      "latency_ms": 35.94
     },
     {
       "id": "q29",
@@ -1161,7 +1162,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.32
+      "latency_ms": 37.37
     },
     {
       "id": "q30",
@@ -1200,7 +1201,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.36
+      "latency_ms": 46.52
     },
     {
       "id": "q31",
@@ -1239,7 +1240,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.34
+      "latency_ms": 49.05
     },
     {
       "id": "q32",
@@ -1278,7 +1279,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.3
+      "latency_ms": 50.79
     },
     {
       "id": "q33",
@@ -1317,7 +1318,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.36
+      "latency_ms": 50.71
     },
     {
       "id": "q34",
@@ -1356,7 +1357,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.39
+      "latency_ms": 49.02
     },
     {
       "id": "q35",
@@ -1395,7 +1396,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.62
+      "latency_ms": 50.88
     },
     {
       "id": "q36",
@@ -1434,7 +1435,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.83
+      "latency_ms": 42.26
     },
     {
       "id": "q37",
@@ -1473,7 +1474,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.3
+      "latency_ms": 36.56
     },
     {
       "id": "q38",
@@ -1512,7 +1513,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.22
+      "latency_ms": 36.33
     },
     {
       "id": "q39",
@@ -1551,7 +1552,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.27
+      "latency_ms": 36.81
     },
     {
       "id": "q40",
@@ -1590,7 +1591,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.42
+      "latency_ms": 41.61
     },
     {
       "id": "q41",
@@ -1629,7 +1630,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.47
+      "latency_ms": 37.05
     },
     {
       "id": "q42",
@@ -1668,7 +1669,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 33.02
+      "latency_ms": 38.55
     },
     {
       "id": "q43",
@@ -1707,7 +1708,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.15
+      "latency_ms": 35.44
     },
     {
       "id": "q44",
@@ -1746,7 +1747,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.11
+      "latency_ms": 39.09
     },
     {
       "id": "q45",
@@ -1785,7 +1786,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 36.64
+      "latency_ms": 35.57
     },
     {
       "id": "q46",
@@ -1824,7 +1825,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 46.08
+      "latency_ms": 36.51
     },
     {
       "id": "q47",
@@ -1863,7 +1864,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.69
+      "latency_ms": 37.42
     },
     {
       "id": "q48",
@@ -1902,7 +1903,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.8
+      "latency_ms": 37.57
     },
     {
       "id": "q49",
@@ -1941,7 +1942,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.84
+      "latency_ms": 38.65
     },
     {
       "id": "q50",
@@ -1980,7 +1981,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.69
+      "latency_ms": 36.89
     },
     {
       "id": "q51",
@@ -2013,7 +2014,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": true,
       "abstained": false,
-      "latency_ms": 34.26
+      "latency_ms": 37.61
     },
     {
       "id": "q52",
@@ -2046,7 +2047,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": true,
       "abstained": false,
-      "latency_ms": 31.3
+      "latency_ms": 37.44
     },
     {
       "id": "q53",
@@ -2079,7 +2080,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": true,
       "abstained": false,
-      "latency_ms": 32.23
+      "latency_ms": 38.73
     },
     {
       "id": "q54",
@@ -2112,9 +2113,9 @@
       "judge_error": "mock_backend",
       "is_unanswerable": true,
       "abstained": false,
-      "latency_ms": 31.96
+      "latency_ms": 38.06
     }
   ],
-  "index_seconds": 0.051,
-  "eval_seconds": 1.803
+  "index_seconds": 0.103,
+  "eval_seconds": 2.403
 }

@@ -23,7 +23,11 @@ TOP_K = int(os.getenv("TOP_K", "3"))
 HASH_EMBED_DIM = int(os.getenv("HASH_EMBED_DIM", "256"))
 
 # Ollama 本地模型
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+# 变量名兼容 OLLAMA_API_BASE：这是 Ollama 生态里常见的写法，
+# 兼容后可自动复用机器上已有的配置，不必再设一份 OLLAMA_BASE_URL。
+OLLAMA_BASE_URL = (
+    os.getenv("OLLAMA_BASE_URL") or os.getenv("OLLAMA_API_BASE") or "http://localhost:11434"
+)
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 
 # ChromaDB 持久化路径。
@@ -31,7 +35,18 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 # 非空 → 数据落盘到该目录，容器重启后依然可检索（部署时必须设置）。
 CHROMA_PATH = os.getenv("CHROMA_PATH", "")
 
-# 智谱 GLM-4 云端
-ZHIPU_API_KEY = os.getenv("ZHIPU_API_KEY", "")
+# DeepSeek 云端（OpenAI 兼容协议）。
+# 注意：DeepSeek **只提供对话（chat）接口，没有 embedding 接口**。
+# 因此它只能用于「生成」和「裁判」两个环节，不能替代向量化后端——
+# 需要语义检索能力时，仍须选 bge（本地模型）或 zhipu（云端 embedding）。
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+DEEPSEEK_CHAT_MODEL = os.getenv("DEEPSEEK_CHAT_MODEL", "deepseek-chat")
+
+# 智谱 GLM-4 云端。
+# API Key 兼容两种变量名：社区文档常用 ZHIPU_API_KEY，
+# 而官方 SDK 与部分安装包写入的是 ZHIPUAI_API_KEY，两个都读以免配置"看起来设了却读不到"。
+ZHIPU_API_KEY = os.getenv("ZHIPU_API_KEY") or os.getenv("ZHIPUAI_API_KEY") or ""
+ZHIPU_BASE_URL = os.getenv("ZHIPU_BASE_URL", "https://open.bigmodel.cn/api/paas/v4")
 ZHIPU_EMBED_MODEL = os.getenv("ZHIPU_EMBED_MODEL", "embedding-3")
 ZHIPU_CHAT_MODEL = os.getenv("ZHIPU_CHAT_MODEL", "glm-4-flash")

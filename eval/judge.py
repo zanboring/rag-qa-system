@@ -2,17 +2,21 @@
 
 支持的后端
 ----------
-任何 **OpenAI 兼容** 的 chat/completions 接口，通过环境变量配置：
+任何 **OpenAI 兼容** 的 chat/completions 接口。未显式配置时的自动解析顺序：
 
-    JUDGE_BASE_URL  默认 https://open.bigmodel.cn/api/paas/v4   （智谱 GLM-4）
-    JUDGE_API_KEY   默认复用 ZHIPU_API_KEY
-    JUDGE_MODEL     默认 glm-4-flash
-    JUDGE_CONCURRENCY 默认 4（并发上限，避免触发服务端限流）
+    1. JUDGE_API_KEY                    显式指定（配合 JUDGE_BASE_URL / JUDGE_MODEL）
+    2. DEEPSEEK_API_KEY                 复用 DeepSeek（base https://api.deepseek.com）
+    3. ZHIPU_API_KEY / ZHIPUAI_API_KEY  复用智谱 GLM-4
+
+可选环境变量：
+    JUDGE_BASE_URL      API 地址（仅第一步生效）
+    JUDGE_MODEL         模型名（仅第一步生效）
+    JUDGE_CONCURRENCY   并发上限，默认 4（避免触发服务端限流）
 
 因此同一份代码可以指向：
-    - 智谱 GLM-4（默认）
+    - DeepSeek、智谱 GLM-4
     - Ollama 本地模型：JUDGE_BASE_URL=http://localhost:11434/v1
-    - 任何其他 OpenAI 兼容网关
+    - 任何其它 OpenAI 兼容网关
 
 设计原则
 --------
@@ -207,7 +211,14 @@ def _clamp(value, low: float = 0.0, high: float = 1.0) -> float | None:
 class LLMJudge:
     """调用 OpenAI 兼容接口做裁判。"""
 
-    name = "llm"
+    @property
+    def name(self) -> str:
+        """裁判标识，会写进评测报告。
+
+        带上模型名而不是笼统的 "llm"：不同裁判模型给出的分数不可直接比较
+        （存在自我偏好、严格程度差异），报告里必须能看出这批分数是哪个模型打的。
+        """
+        return f"llm:{self.model}"
 
     def __init__(
         self,
@@ -300,19 +311,45 @@ class LLMJudge:
 # ---------------------------------------------------------------------------
 
 def get_judge():
-    """按环境变量返回裁判实例；未配置 API Key 时降级为规则裁判。
+    """按环境变量返回裁判实例；未配置任何 API Key 时降级为规则裁判。
 
-    API Key 的解析顺序：
-        JUDGE_API_KEY → ZHIPU_API_KEY → （无）
-    这样只配置了项目本身的 ZHIPU_API_KEY 时也能直接用于评测，无需重复配置。
+    后端解析顺序（显式配置优先于自动复用）：
+        1. JUDGE_API_KEY                     —— 完全显式指定裁判
+        2. DEEPSEEK_API_KEY                  —— 复用 DeepSeek（OpenAI 兼容）
+        3. ZHIPU_API_KEY / ZHIPUAI_API_KEY   —— 复用智谱
+
+    为什么 base_url、model、api_key 必须从同一个候选里成组取：
+    若只取 key 却套用另一家的默认地址，会得到 401 或 404，
+    而错误信息不会提示"key 与地址不匹配"，排查成本很高。
+    让三者绑定在一起，可以彻底排除这类错配。
     """
-    api_key = os.getenv("JUDGE_API_KEY") or os.getenv("ZHIPU_API_KEY") or ""
-    if not api_key:
-        return RuleBasedJudge()
+    concurrency = int(os.getenv("JUDGE_CONCURRENCY", "4"))
 
-    return LLMJudge(
-        base_url=os.getenv("JUDGE_BASE_URL", "https://open.bigmodel.cn/api/paas/v4"),
-        api_key=api_key,
-        model=os.getenv("JUDGE_MODEL", "glm-4-flash"),
-        concurrency=int(os.getenv("JUDGE_CONCURRENCY", "4")),
-    )
+    explicit_key = os.getenv("JUDGE_API_KEY")
+    if explicit_key:
+        return LLMJudge(
+            base_url=os.getenv("JUDGE_BASE_URL", "https://open.bigmodel.cn/api/paas/v4"),
+            api_key=explicit_key,
+            model=os.getenv("JUDGE_MODEL", "glm-4-flash"),
+            concurrency=concurrency,
+        )
+
+    deepseek_key = os.getenv("DEEPSEEK_API_KEY")
+    if deepseek_key:
+        return LLMJudge(
+            base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
+            api_key=deepseek_key,
+            model=os.getenv("DEEPSEEK_CHAT_MODEL", "deepseek-chat"),
+            concurrency=concurrency,
+        )
+
+    zhipu_key = os.getenv("ZHIPU_API_KEY") or os.getenv("ZHIPUAI_API_KEY")
+    if zhipu_key:
+        return LLMJudge(
+            base_url=os.getenv("ZHIPU_BASE_URL", "https://open.bigmodel.cn/api/paas/v4"),
+            api_key=zhipu_key,
+            model=os.getenv("ZHIPU_CHAT_MODEL", "glm-4-flash"),
+            concurrency=concurrency,
+        )
+
+    return RuleBasedJudge()
