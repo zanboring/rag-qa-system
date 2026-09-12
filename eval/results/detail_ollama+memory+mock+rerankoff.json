@@ -1,36 +1,36 @@
 {
-  "config": "hash4096+memory+mock+rerankoff",
+  "config": "ollama+memory+mock+rerankoff",
   "llm_backend": "mock",
   "config_detail": {
-    "embedding": "hash",
+    "embedding": "ollama",
     "vector": "memory",
     "llm": "mock",
     "rerank": false,
     "top_k": 5,
-    "hash_dim": 4096
+    "hash_dim": null
   },
   "summary": {
     "sample_total": 54,
     "answerable": 50,
     "unanswerable": 4,
-    "hit_at_1": 0.68,
-    "hit_at_3": 0.88,
-    "hit_at_5": 0.92,
-    "recall_at_3": 0.83,
-    "recall_at_5": 0.89,
-    "precision_at_3": 0.3133,
-    "mrr": 0.779,
-    "ndcg_at_5": 0.8092,
-    "keyword_coverage": 0.125,
-    "context_recall": 0.9533,
+    "hit_at_1": 0.7,
+    "hit_at_3": 0.96,
+    "hit_at_5": 1.0,
+    "recall_at_3": 0.91,
+    "recall_at_5": 0.97,
+    "precision_at_3": 0.34,
+    "mrr": 0.8333,
+    "ndcg_at_5": 0.869,
+    "keyword_coverage": 0.1517,
+    "context_recall": 0.9933,
     "mock_backend_ratio": 1.0,
     "generation_metrics_available": false,
     "faithfulness": null,
     "answer_relevancy": null,
     "abstention_accuracy": null,
     "false_abstention_rate": null,
-    "latency_p50_ms": 30.23,
-    "latency_p95_ms": 31.15
+    "latency_p50_ms": 98.5,
+    "latency_p95_ms": 148.3
   },
   "rows": [
     {
@@ -40,7 +40,7 @@
       "difficulty": "easy",
       "retrieved_docs": [
         "01-rag-overview.md",
-        "15-ollama-local.md",
+        "10-prompt-structure.md",
         "01-rag-overview.md",
         "14-ragas-judge.md",
         "11-hallucination.md"
@@ -70,7 +70,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 32.08
+      "latency_ms": 66.48
     },
     {
       "id": "q02",
@@ -79,10 +79,10 @@
       "difficulty": "easy",
       "retrieved_docs": [
         "01-rag-overview.md",
+        "01-rag-overview.md",
         "15-ollama-local.md",
         "14-ragas-judge.md",
-        "01-rag-overview.md",
-        "01-rag-overview.md"
+        "11-hallucination.md"
       ],
       "relevance": [
         1,
@@ -100,7 +100,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：答话术，用 RAG 提供事实依据。如果目标是让模型掌握新知识，RAG 在成本、可更新性、可溯源三方面都优于微调；如果目标是让模型稳定输出特定格式或语气，微调更合适。\n\n【用户问题】\n为什么说 RAG 的效果瓶颈通常在检索环节而不是生成环节？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：该在输出侧增加校验环节，而不是假设 RAG 已经解决了问题。最低限度也应当保留引用信息，让用户能够自行核对答案依据——**可核查性比绝对正确更现实，也更有价值**。\n\n【用户问题】\n为什么说 RAG 的效果瓶颈通常在检索环节而不是生成环节？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -109,7 +109,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.35
+      "latency_ms": 282.35
     },
     {
       "id": "q03",
@@ -117,29 +117,29 @@
       "type": "single_hop",
       "difficulty": "medium",
       "retrieved_docs": [
-        "15-ollama-local.md",
         "01-rag-overview.md",
-        "11-hallucination.md",
-        "14-ragas-judge.md",
-        "09-cross-encoder.md"
+        "01-rag-overview.md",
+        "01-rag-overview.md",
+        "15-ollama-local.md",
+        "11-hallucination.md"
       ],
       "relevance": [
         0,
-        0,
+        1,
         0,
         0,
         0
       ],
       "total_relevant": 1,
       "hit_at_1": 0.0,
-      "hit_at_3": 0.0,
-      "hit_at_5": 0.0,
-      "recall_at_3": 0.0,
-      "recall_at_5": 0.0,
-      "precision_at_3": 0.0,
-      "mrr": 0.0,
-      "ndcg_at_5": 0.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\"当前瓶颈在融合还是判断\"。如果多路召回结果各有所长、需要互补，RRF 就够了；如果召回结果的排序本身就不准，必须换更准的裁判，那就得上 cross-encoder。\n\n【用户问题】\nRAG 和微调分别改变模型的什么能力，各自适合什么目标？",
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：应该在输出侧增加校验环节，而不是假设 RAG 已经解决了问题。最低限度也应当保留引用信息，让用户能够自行核对答案依据——**可核查性比绝对正确更现实，也更有价值**。\n\n【用户问题】\nRAG 和微调分别改变模型的什么能力，各自适合什么目标？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -148,7 +148,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 31.57
+      "latency_ms": 260.63
     },
     {
       "id": "q04",
@@ -157,10 +157,10 @@
       "difficulty": "easy",
       "retrieved_docs": [
         "01-rag-overview.md",
+        "01-rag-overview.md",
         "15-ollama-local.md",
         "01-rag-overview.md",
-        "14-ragas-judge.md",
-        "10-prompt-structure.md"
+        "11-hallucination.md"
       ],
       "relevance": [
         1,
@@ -178,7 +178,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾： [2] 来源《文档名》片段3：\n    <片段正文>\n\n编号让模型可以在答案中用 `[1]` 这样的形式引用，也让前端能把引用映射回原文位置，实现可溯源。带上文档名和片段序号\n\n【用户问题】\nRAG 主要缓解了大语言模型的哪三个固有短板？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：此生产系统应该在输出侧增加校验环节，而不是假设 RAG 已经解决了问题。最低限度也应当保留引用信息，让用户能够自行核对答案依据——**可核查性比绝对正确更现实，也更有价值**。\n\n【用户问题】\nRAG 主要缓解了大语言模型的哪三个固有短板？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -187,7 +187,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.41
+      "latency_ms": 232.41
     },
     {
       "id": "q05",
@@ -197,8 +197,8 @@
       "retrieved_docs": [
         "02-chunking-strategy.md",
         "02-chunking-strategy.md",
-        "08-rerank-rrf.md",
-        "08-rerank-rrf.md",
+        "02-chunking-strategy.md",
+        "07-bm25-hybrid.md",
         "09-cross-encoder.md"
       ],
       "relevance": [
@@ -217,7 +217,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：-encoder 的输入长度有限（通常 512 token），查询与文档拼接后若超出会被截断。如果文档片段本身很长，截断可能切掉答案所在部分，导致精排反而把正确候选打低分。因此**精排适\n\n【用户问题】\n切片时为什么要在相邻块之间保留重叠？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：coder 处在不同的成本档位：\n\n- **RRF**：不需要任何模型，只融合已有排序信号的名次。零成本，但无法产生新的相关性判断——如果所有召回信号都把错误片段排在第一，RRF 也救不\n\n【用户问题】\n切片时为什么要在相邻块之间保留重叠？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -226,7 +226,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.45
+      "latency_ms": 66.75
     },
     {
       "id": "q06",
@@ -235,9 +235,87 @@
       "difficulty": "medium",
       "retrieved_docs": [
         "02-chunking-strategy.md",
-        "07-bm25-hybrid.md",
-        "06-vector-db-selection.md",
-        "05-ann-index.md",
+        "02-chunking-strategy.md",
+        "02-chunking-strategy.md",
+        "09-cross-encoder.md",
+        "10-prompt-structure.md"
+      ],
+      "relevance": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：求了 JSON，仍应对输出做容错解析——模型偶尔会在 JSON 外包裹解释性文字或 markdown 代码块标记。\n\n## 上下文与成本\n\n提示词的 token 数直\n\n【用户问题】\n切片的重叠率一般取多少比较合适，太高或太低各有什么问题？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 73.58
+    },
+    {
+      "id": "q07",
+      "question": "边界优先切片中，最小保留比例 MIN_KEEP_RATIO 的作用是什么？",
+      "type": "numeric",
+      "difficulty": "medium",
+      "retrieved_docs": [
+        "02-chunking-strategy.md",
+        "09-cross-encoder.md",
+        "02-chunking-strategy.md",
+        "02-chunking-strategy.md",
+        "01-rag-overview.md"
+      ],
+      "relevance": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 0.0,
+      "hit_at_3": 0.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 0.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.0,
+      "mrr": 0.25,
+      "ndcg_at_5": 0.43067655807339306,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：别\n\n微调（Fine-tuning）改变的是模型的\"表达风格与任务能力\"，RAG 改变的是模型\"能看到什么信息\"。两者并不互斥：常见组合是用微调让模\n\n【用户问题】\n边界优先切片中，最小保留比例 MIN_KEEP_RATIO 的作用是什么？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 100.95
+    },
+    {
+      "id": "q08",
+      "question": "递归字符切片和语义切片各自的思路是什么？",
+      "type": "comparison",
+      "difficulty": "medium",
+      "retrieved_docs": [
+        "02-chunking-strategy.md",
+        "02-chunking-strategy.md",
+        "03-embedding-models.md",
+        "02-chunking-strategy.md",
         "07-bm25-hybrid.md"
       ],
       "relevance": [
@@ -256,8 +334,8 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：ll@10 已经在 95% 以上，引入 BM25 的边际收益可能不足以抵消复杂度。\n\n## 与重排序的区别\n\n需要注意，混合检索和重排序是**两个不同阶段的优化**：\n\n【用户问题】\n切片的重叠率一般取多少比较合适，太高或太低各有什么问题？",
-      "keyword_coverage": 0.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：更容易命中词项，需要惩罚。参数 `b`（通常 0.75）控制归一化强度。\n\nBM25 完全基于词项精确匹配，没有任何语义泛化能力——\"排序算法\" 和 \"sorting algorit\n\n【用户问题】\n递归字符切片和语义切片各自的思路是什么？",
+      "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
@@ -265,19 +343,19 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.72
+      "latency_ms": 99.38
     },
     {
-      "id": "q07",
-      "question": "边界优先切片中，最小保留比例 MIN_KEEP_RATIO 的作用是什么？",
-      "type": "numeric",
+      "id": "q09",
+      "question": "中文检索场景常用哪个开源 embedding 模型，查询侧有什么特殊处理？",
+      "type": "single_hop",
       "difficulty": "medium",
       "retrieved_docs": [
-        "02-chunking-strategy.md",
-        "02-chunking-strategy.md",
-        "08-rerank-rrf.md",
+        "03-embedding-models.md",
+        "03-embedding-models.md",
         "16-glm4-api.md",
-        "08-rerank-rrf.md"
+        "07-bm25-hybrid.md",
+        "15-ollama-local.md"
       ],
       "relevance": [
         0,
@@ -295,7 +373,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 0.5,
       "ndcg_at_5": 0.6309297535714575,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：排 | 需要精排模型 | 最好 | 较高 | 对 Top-3 准确率要求高的场景 |\n\nRRF 的定位是**零依赖的中间方案**：不引入新模型就能融\n\n【用户问题】\n边界优先切片中，最小保留比例 MIN_KEEP_RATIO 的作用是什么？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：效果弱于云端旗舰模型**：7B 级本地模型在复杂推理、指令遵循、长上下文处理上与云端大模型有明显差距。对 RAG 而言，最直接的体现是\"依据资料作答\n\n【用户问题】\n中文检索场景常用哪个开源 embedding 模型，查询侧有什么特殊处理？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -304,19 +382,19 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.95
+      "latency_ms": 96.83
     },
     {
-      "id": "q08",
-      "question": "递归字符切片和语义切片各自的思路是什么？",
-      "type": "comparison",
+      "id": "q10",
+      "question": "用哈希 n-gram 做 embedding 的本质缺陷是什么？",
+      "type": "single_hop",
       "difficulty": "medium",
       "retrieved_docs": [
-        "02-chunking-strategy.md",
-        "04-vector-similarity.md",
-        "02-chunking-strategy.md",
-        "02-chunking-strategy.md",
-        "08-rerank-rrf.md"
+        "03-embedding-models.md",
+        "03-embedding-models.md",
+        "03-embedding-models.md",
+        "16-glm4-api.md",
+        "06-vector-db-selection.md"
       ],
       "relevance": [
         1,
@@ -334,46 +412,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：k Fusion）是一种结果融合算法，用于把多个不同来源的排序结果合成一个统一排序。\n\n计算公式：\n\n    RRF_score(d) = Σ 1 / (k + rank_i(d))\n\n【用户问题】\n递归字符切片和语义切片各自的思路是什么？",
-      "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.09
-    },
-    {
-      "id": "q09",
-      "question": "中文检索场景常用哪个开源 embedding 模型，查询侧有什么特殊处理？",
-      "type": "single_hop",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "03-embedding-models.md",
-        "16-glm4-api.md",
-        "03-embedding-models.md",
-        "15-ollama-local.md",
-        "02-chunking-strategy.md"
-      ],
-      "relevance": [
-        0,
-        0,
-        1,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 0.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 0.3333333333333333,
-      "ndcg_at_5": 0.5,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：决于文档形态：结构规整的 Markdown／HTML 适合按标题层级切；口语化的客服对话适合按轮次切；没有明显结构的纯文本才需要递归或语义切片兜底。\n\n【用户问题】\n中文检索场景常用哪个开源 embedding 模型，查询侧有什么特殊处理？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：S 常作为\"检索内核\"被上层服务包装。\n\n选择 FAISS 意味着接受\"自己造数据库\"的工程量；只有当性能或索引类型的需求超出现成数据库能力时才值得。\n\n##\n\n【用户问题】\n用哈希 n-gram 做 embedding 的本质缺陷是什么？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -382,46 +421,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.32
-    },
-    {
-      "id": "q10",
-      "question": "用哈希 n-gram 做 embedding 的本质缺陷是什么？",
-      "type": "single_hop",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "03-embedding-models.md",
-        "03-embedding-models.md",
-        "16-glm4-api.md",
-        "07-bm25-hybrid.md",
-        "03-embedding-models.md"
-      ],
-      "relevance": [
-        0,
-        0,
-        0,
-        0,
-        1
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 0.0,
-      "hit_at_3": 0.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 0.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.0,
-      "mrr": 0.2,
-      "ndcg_at_5": 0.38685280723454163,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：536 维、100 万条，则达到约 6 GB，此时就必须考虑量化压缩（如 int8 量化可降至 1/4）或磁盘索引。因此维度选择不只是效果问题，也是成本问题。\n\n【用户问题】\n用哈希 n-gram 做 embedding 的本质缺陷是什么？",
-      "keyword_coverage": 0.0,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.94
+      "latency_ms": 101.32
     },
     {
       "id": "q11",
@@ -430,9 +430,9 @@
       "difficulty": "hard",
       "retrieved_docs": [
         "03-embedding-models.md",
-        "09-cross-encoder.md",
         "05-ann-index.md",
-        "03-embedding-models.md",
+        "05-ann-index.md",
+        "06-vector-db-selection.md",
         "05-ann-index.md"
       ],
       "relevance": [
@@ -460,7 +460,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 29.78
+      "latency_ms": 98.98
     },
     {
       "id": "q12",
@@ -473,6 +473,84 @@
         "04-vector-similarity.md",
         "03-embedding-models.md",
         "03-embedding-models.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：U 上即可推理，适合中小规模知识库。bge-large-zh-v1.5 维度 1024，效果更好但需要 GPU 才实用。\n\n使用 BGE 做检索时有一个关键细节：**查\n\n【用户问题】\n向量做 L2 归一化之后，点积和余弦相似度是什么关系？",
+      "keyword_coverage": 0.3333333333333333,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 98.71
+    },
+    {
+      "id": "q13",
+      "question": "归一化之后欧氏距离和余弦相似度为什么排序结果一致？",
+      "type": "single_hop",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "04-vector-similarity.md",
+        "04-vector-similarity.md",
+        "04-vector-similarity.md",
+        "06-vector-db-selection.md",
+        "13-ir-metrics.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：| Recall@K | 检索上限，优先优化 |\n| 用户只看第一条 | MRR | 对首位敏感 |\n| 排序质量整体 | nDCG@K | 综合考虑位置与等级 |\n| 上\n\n【用户问题】\n归一化之后欧氏距离和余弦相似度为什么排序结果一致？",
+      "keyword_coverage": 0.3333333333333333,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 98.57
+    },
+    {
+      "id": "q14",
+      "question": "把 1 减去 L2 距离当作相似度使用会带来什么问题？",
+      "type": "single_hop",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "04-vector-similarity.md",
+        "04-vector-similarity.md",
+        "06-vector-db-selection.md",
+        "04-vector-similarity.md",
+        "12-abstention-confidence.md"
       ],
       "relevance": [
         0,
@@ -490,94 +568,16 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 0.5,
       "ndcg_at_5": 0.6309297535714575,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：若换成 1536 维、100 万条，则达到约 6 GB，此时就必须考虑量化压缩（如 int8 量化可降至 1/4）或磁盘索引。因此维度选择不只是效果问题，也是成本问题。\n\n【用户问题】\n向量做 L2 归一化之后，点积和余弦相似度是什么关系？",
-      "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.33
-    },
-    {
-      "id": "q13",
-      "question": "归一化之后欧氏距离和余弦相似度为什么排序结果一致？",
-      "type": "single_hop",
-      "difficulty": "hard",
-      "retrieved_docs": [
-        "04-vector-similarity.md",
-        "04-vector-similarity.md",
-        "04-vector-similarity.md",
-        "16-glm4-api.md",
-        "12-abstention-confidence.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：义是\"该片段在 Top-K 中的相对占比\"，而不是\"这个答案有多可信\"。它有两个反直觉的性质：\n\n- **单片段场景恒为 1.0**：当只召回一个片段时，无论其原始相似度是\n\n【用户问题】\n归一化之后欧氏距离和余弦相似度为什么排序结果一致？",
-      "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.11
-    },
-    {
-      "id": "q14",
-      "question": "把 1 减去 L2 距离当作相似度使用会带来什么问题？",
-      "type": "single_hop",
-      "difficulty": "hard",
-      "retrieved_docs": [
-        "04-vector-similarity.md",
-        "06-vector-db-selection.md",
-        "03-embedding-models.md",
-        "07-bm25-hybrid.md",
-        "08-rerank-rrf.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：序信号都**具有一定可靠性**。如果某一路检索质量很差，它给出的排名会把噪声引入融合结果，反而拉低整体表现。\n\n举个例子：假设有两路信号，A 路语义排序可靠，B 路因为\n\n【用户问题】\n把 1 减去 L2 距离当作相似度使用会带来什么问题？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：拒答权交给生成模型：在系统提示词中明确授权它说\"资料中未找到相关信息\"，并通过 few-shot 示例强化这一行为。\n\n优点是模型能理解语义层面的\"资料是否足以回答\"，\n\n【用户问题】\n把 1 减去 L2 距离当作相似度使用会带来什么问题？",
       "keyword_coverage": 0.0,
-      "context_recall": 0.3333333333333333,
+      "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
       "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 29.96
+      "latency_ms": 99.75
     },
     {
       "id": "q15",
@@ -586,9 +586,9 @@
       "difficulty": "medium",
       "retrieved_docs": [
         "04-vector-similarity.md",
-        "09-cross-encoder.md",
+        "12-abstention-confidence.md",
+        "14-ragas-judge.md",
         "13-ir-metrics.md",
-        "04-vector-similarity.md",
         "04-vector-similarity.md"
       ],
       "relevance": [
@@ -607,7 +607,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：后可以用计算更快的点积替代余弦，且能直接使用针对内积优化的索引结构（如 FAISS 的 IndexFlatIP）。\n\n## 欧氏距离\n\n欧氏距离是向量空间中的直线距离：\n\n【用户问题】\n为什么维度升高之后仅凭相似度绝对阈值判断相关性不可靠？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：L2 距离的范围是 0 到 2，`1 - dist` 的取值范围会落到 -1 到 1，但它的数值大小与余弦相似度并不相等（例如 L2 = 0.5 对应 cos ≈ 0.\n\n【用户问题】\n为什么维度升高之后仅凭相似度绝对阈值判断相关性不可靠？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -616,7 +616,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.01
+      "latency_ms": 103.01
     },
     {
       "id": "q16",
@@ -625,10 +625,10 @@
       "difficulty": "medium",
       "retrieved_docs": [
         "05-ann-index.md",
-        "06-vector-db-selection.md",
-        "07-bm25-hybrid.md",
-        "12-abstention-confidence.md",
-        "06-vector-db-selection.md"
+        "05-ann-index.md",
+        "05-ann-index.md",
+        "13-ir-metrics.md",
+        "05-ann-index.md"
       ],
       "relevance": [
         1,
@@ -646,7 +646,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：e\": \"cosine\"})\n\n  若使用默认 L2，查询返回的 `distances` 是欧氏距离，把它当作相似度直接使用（例如取 `1 - distance`）会导致分数\n\n【用户问题】\nHNSW 索引的查询期精度和速度由哪个参数控制？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：，而是以高概率返回接近最优的结果。衡量指标是 **召回率（recall）**：ANN 返回的 Top-K 里包含多少真正的 Top-K。工程上通常把召回率调到 95% 以上，\n\n【用户问题】\nHNSW 索引的查询期精度和速度由哪个参数控制？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -655,7 +655,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 29.84
+      "latency_ms": 99.57
     },
     {
       "id": "q17",
@@ -664,9 +664,87 @@
       "difficulty": "medium",
       "retrieved_docs": [
         "05-ann-index.md",
+        "05-ann-index.md",
+        "05-ann-index.md",
+        "06-vector-db-selection.md",
+        "08-rerank-rrf.md"
+      ],
+      "relevance": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.3333333333333333,
+      "ndcg_at_5": 0.5,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：零依赖的中间方案**：不引入新模型就能融合多路排序信号，适合作为资源受限环境下的默认精排策略。当算力允许时，cross-encoder 在最终排序质量上明显更优。\n\n【用户问题】\nIVF 索引里 nlist 和 nprobe 分别控制什么？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 97.88
+    },
+    {
+      "id": "q18",
+      "question": "乘积量化 PQ 是怎么压缩向量的，压缩比大概多少？",
+      "type": "single_hop",
+      "difficulty": "medium",
+      "retrieved_docs": [
+        "05-ann-index.md",
         "03-embedding-models.md",
-        "14-ragas-judge.md",
-        "07-bm25-hybrid.md",
+        "03-embedding-models.md",
+        "05-ann-index.md",
+        "05-ann-index.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：精度损失是**可以量化管理**的。上线前应当用一小批真实查询做基准，测量 ANN 结果与暴力检索结果的召回率，确认损失在可接受范围；而不是凭感觉认为\"近似检索差不多就行\"。\n\n【用户问题】\n乘积量化 PQ 是怎么压缩向量的，压缩比大概多少？",
+      "keyword_coverage": 0.3333333333333333,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 95.97
+    },
+    {
+      "id": "q19",
+      "question": "ChromaDB 默认使用什么距离度量，使用时需要注意什么？",
+      "type": "single_hop",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "06-vector-db-selection.md",
+        "04-vector-similarity.md",
+        "06-vector-db-selection.md",
+        "06-vector-db-selection.md",
         "16-glm4-api.md"
       ],
       "relevance": [
@@ -685,7 +763,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\n\n## 工程实践要点\n\n**1. 复用 HTTP 连接**\n\n每次请求都新建客户端会导致反复的 TCP 握手与 TLS 协商，在高频调用下开销显著。应当复用同一\n\n【用户问题】\nIVF 索引里 nlist 和 nprobe 分别控制什么？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\n\n## 工程实践要点\n\n**1. 复用 HTTP 连接**\n\n每次请求都新建客户端会导致反复的 TCP 握手与 TLS 协商，在高频调用下开销显著。应当复用同一\n\n【用户问题】\nChromaDB 默认使用什么距离度量，使用时需要注意什么？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -694,85 +772,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 29.9
-    },
-    {
-      "id": "q18",
-      "question": "乘积量化 PQ 是怎么压缩向量的，压缩比大概多少？",
-      "type": "single_hop",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "05-ann-index.md",
-        "05-ann-index.md",
-        "06-vector-db-selection.md",
-        "15-ollama-local.md",
-        "03-embedding-models.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：CPU 上即可推理，适合中小规模知识库。bge-large-zh-v1.5 维度 1024，效果更好但需要 GPU 才实用。\n\n使用 BGE 做检索时有一个关键细节：**查\n\n【用户问题】\n乘积量化 PQ 是怎么压缩向量的，压缩比大概多少？",
-      "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.92
-    },
-    {
-      "id": "q19",
-      "question": "ChromaDB 默认使用什么距离度量，使用时需要注意什么？",
-      "type": "single_hop",
-      "difficulty": "hard",
-      "retrieved_docs": [
-        "06-vector-db-selection.md",
-        "04-vector-similarity.md",
-        "06-vector-db-selection.md",
-        "07-bm25-hybrid.md",
-        "10-prompt-structure.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾： JSON，仍应对输出做容错解析——模型偶尔会在 JSON 外包裹解释性文字或 markdown 代码块标记。\n\n## 上下文与成本\n\n提示词的 token 数直\n\n【用户问题】\nChromaDB 默认使用什么距离度量，使用时需要注意什么？",
-      "keyword_coverage": 0.0,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.98
+      "latency_ms": 95.27
     },
     {
       "id": "q20",
@@ -781,49 +781,10 @@
       "difficulty": "hard",
       "retrieved_docs": [
         "06-vector-db-selection.md",
+        "06-vector-db-selection.md",
         "04-vector-similarity.md",
-        "06-vector-db-selection.md",
-        "10-prompt-structure.md",
-        "04-vector-similarity.md"
-      ],
-      "relevance": [
-        0,
-        0,
-        1,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 0.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 0.3333333333333333,
-      "ndcg_at_5": 0.5,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：代余弦，且能直接使用针对内积优化的索引结构（如 FAISS 的 IndexFlatIP）。\n\n## 欧氏距离\n\n欧氏距离是向量空间中的直线距离：\n\n【用户问题】\nChromaDB 里 collection.get() 为什么有时取不到向量？",
-      "keyword_coverage": 0.0,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.02
-    },
-    {
-      "id": "q21",
-      "question": "FAISS 和向量数据库的本质区别是什么？",
-      "type": "single_hop",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "06-vector-db-selection.md",
-        "06-vector-db-selection.md",
-        "06-vector-db-selection.md",
-        "07-bm25-hybrid.md",
-        "07-bm25-hybrid.md"
+        "05-ann-index.md",
+        "16-glm4-api.md"
       ],
       "relevance": [
         0,
@@ -841,8 +802,8 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 0.5,
       "ndcg_at_5": 0.6309297535714575,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：候选池。\n- 重排序发生在**精排阶段**，目标是在已有候选池中把最相关的排到最前面。\n\n二者互补：召回决定上限，精排决定排序。如果召回阶段就漏掉了正确片段，重排序再强也无能为力。\n\n【用户问题】\nFAISS 和向量数据库的本质区别是什么？",
-      "keyword_coverage": 0.3333333333333333,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：要点\n\n**1. 复用 HTTP 连接**\n\n每次请求都新建客户端会导致反复的 TCP 握手与 TLS 协商，在高频调用下开销显著。应当复用同一\n\n【用户问题】\nChromaDB 里 collection.get() 为什么有时取不到向量？",
+      "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
@@ -850,19 +811,19 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.1
+      "latency_ms": 98.9
     },
     {
-      "id": "q22",
-      "question": "向量规模在 10 万到 1000 万之间推荐用哪种索引方案，为什么？",
+      "id": "q21",
+      "question": "FAISS 和向量数据库的本质区别是什么？",
       "type": "single_hop",
       "difficulty": "medium",
       "retrieved_docs": [
-        "05-ann-index.md",
-        "09-cross-encoder.md",
-        "03-embedding-models.md",
-        "07-bm25-hybrid.md",
-        "10-prompt-structure.md"
+        "06-vector-db-selection.md",
+        "06-vector-db-selection.md",
+        "06-vector-db-selection.md",
+        "06-vector-db-selection.md",
+        "04-vector-similarity.md"
       ],
       "relevance": [
         1,
@@ -880,8 +841,8 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：是主要成本来源。因此**降低 top_k 或缩短切片长度都是直接的成本优化手段**——但必须以评测数据为依据，确认质量损失可接受，而不是拍脑袋压缩上下文。\n\n【用户问题】\n向量规模在 10 万到 1000 万之间推荐用哪种索引方案，为什么？",
-      "keyword_coverage": 0.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：量归一化时，L2 距离的范围是 0 到 2，`1 - dist` 的取值范围会落到 -1 到 1，但它的数值大小与余弦相似度并不相等（例如 L2 = 0.5 对应 cos ≈ 0.\n\n【用户问题】\nFAISS 和向量数据库的本质区别是什么？",
+      "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
@@ -889,18 +850,18 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.41
+      "latency_ms": 99.74
     },
     {
-      "id": "q23",
-      "question": "BM25 的 k1 和 b 两个参数各自控制什么？",
+      "id": "q22",
+      "question": "向量规模在 10 万到 1000 万之间推荐用哪种索引方案，为什么？",
       "type": "single_hop",
       "difficulty": "medium",
       "retrieved_docs": [
-        "07-bm25-hybrid.md",
-        "07-bm25-hybrid.md",
-        "07-bm25-hybrid.md",
-        "03-embedding-models.md",
+        "05-ann-index.md",
+        "06-vector-db-selection.md",
+        "06-vector-db-selection.md",
+        "05-ann-index.md",
         "05-ann-index.md"
       ],
       "relevance": [
@@ -919,7 +880,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：价是精度损失，通常与 IVF 组合使用（IVF-PQ），在十亿级数据集上是标准方案。\n\n## 选型建议\n\n按规模递进的经验路径：\n\n| 向量规模 | 推荐方案 | 理由 |\n\n【用户问题】\nBM25 的 k1 和 b 两个参数各自控制什么？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：的索引\n\nIVF（Inverted File Index）先用 k-means 把所有向量聚成若干簇，每个簇维护一个倒排列表存成员向量。检索时先找出与查询\n\n【用户问题】\n向量规模在 10 万到 1000 万之间推荐用哪种索引方案，为什么？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -928,7 +889,46 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.75
+      "latency_ms": 98.5
+    },
+    {
+      "id": "q23",
+      "question": "BM25 的 k1 和 b 两个参数各自控制什么？",
+      "type": "single_hop",
+      "difficulty": "medium",
+      "retrieved_docs": [
+        "07-bm25-hybrid.md",
+        "07-bm25-hybrid.md",
+        "08-rerank-rrf.md",
+        "07-bm25-hybrid.md",
+        "15-ollama-local.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：；13B 约需 8 到 10 GB；32B 及以上通常需要 24 GB 显存。若显存不足，Ollama 会回退到 CPU 推理，速度会下降一个数量级（从每秒几十 token\n\n【用户问题】\nBM25 的 k1 和 b 两个参数各自控制什么？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 99.23
     },
     {
       "id": "q24",
@@ -939,7 +939,7 @@
         "07-bm25-hybrid.md",
         "07-bm25-hybrid.md",
         "07-bm25-hybrid.md",
-        "06-vector-db-selection.md",
+        "03-embedding-models.md",
         "05-ann-index.md"
       ],
       "relevance": [
@@ -958,7 +958,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：以高概率返回接近最优的结果。衡量指标是 **召回率（recall）**：ANN 返回的 Top-K 里包含多少真正的 Top-K。工程上通常把召回率调到 95% 以上，\n\n【用户问题】\n什么类型的查询向量检索会失手，需要用 BM25 补足？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：精度损失，通常与 IVF 组合使用（IVF-PQ），在十亿级数据集上是标准方案。\n\n## 选型建议\n\n按规模递进的经验路径：\n\n| 向量规模 | 推荐方案 | 理由 |\n\n【用户问题】\n什么类型的查询向量检索会失手，需要用 BM25 补足？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -967,7 +967,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.41
+      "latency_ms": 98.08
     },
     {
       "id": "q25",
@@ -977,9 +977,9 @@
       "retrieved_docs": [
         "07-bm25-hybrid.md",
         "07-bm25-hybrid.md",
-        "10-prompt-structure.md",
         "07-bm25-hybrid.md",
-        "05-ann-index.md"
+        "08-rerank-rrf.md",
+        "09-cross-encoder.md"
       ],
       "relevance": [
         1,
@@ -997,8 +997,8 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：以上。代价是精度损失，通常与 IVF 组合使用（IVF-PQ），在十亿级数据集上是标准方案。\n\n## 选型建议\n\n按规模递进的经验路径：\n\n| 向量规模 | 推荐方案 | 理由 |\n\n【用户问题】\n从哪些角度判断一个场景是否值得上混合检索？",
-      "keyword_coverage": 0.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\n\n选择依据是\"当前瓶颈在融合还是判断\"。如果多路召回结果各有所长、需要互补，RRF 就够了；如果召回结果的排序本身就不准，必须换更准的裁判，那就得上 cross-encoder。\n\n【用户问题】\n从哪些角度判断一个场景是否值得上混合检索？",
+      "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
@@ -1006,7 +1006,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.98
+      "latency_ms": 97.39
     },
     {
       "id": "q26",
@@ -1015,15 +1015,15 @@
       "difficulty": "medium",
       "retrieved_docs": [
         "07-bm25-hybrid.md",
-        "07-bm25-hybrid.md",
         "08-rerank-rrf.md",
-        "05-ann-index.md",
-        "09-cross-encoder.md"
+        "07-bm25-hybrid.md",
+        "09-cross-encoder.md",
+        "07-bm25-hybrid.md"
       ],
       "relevance": [
         1,
-        1,
         0,
+        1,
         0,
         0
       ],
@@ -1035,8 +1035,8 @@
       "recall_at_5": 1.0,
       "precision_at_3": 0.6666666666666666,
       "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\n\n## 为什么不能直接用它做检索\n\nCross-encoder 的精度优势是用计算量换来的。它无法预计算文档表示：**每来一个查询，都要把查询跟库中每一条文档重新拼接、\n\n【用户问题】\n混合检索和重排序分别发生在哪个阶段，它们是什么关系？",
+      "ndcg_at_5": 0.9197207891481876,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾： **jieba 分词**：通用中文分词库，速度快，对技术文本准确率尚可。\n- **HanLP**：准确率更高，支持分词、词性标注、命名实体识别，资源占用更大。\n- **\n\n【用户问题】\n混合检索和重排序分别发生在哪个阶段，它们是什么关系？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -1045,7 +1045,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.64
+      "latency_ms": 98.84
     },
     {
       "id": "q27",
@@ -1056,85 +1056,7 @@
         "08-rerank-rrf.md",
         "08-rerank-rrf.md",
         "08-rerank-rrf.md",
-        "09-cross-encoder.md",
-        "06-vector-db-selection.md"
-      ],
-      "relevance": [
-        1,
-        1,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 2,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.6666666666666666,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：ce\": \"cosine\"})\n\n  若使用默认 L2，查询返回的 `distances` 是欧氏距离，把它当作相似度直接使用（例如取 `1 - distance`）会导致分数\n\n【用户问题】\nRRF 的计算公式是什么，平滑常数通常取多少？",
-      "keyword_coverage": 0.0,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.43
-    },
-    {
-      "id": "q28",
-      "question": "RRF 在什么情况下会失效，它有什么内在局限？",
-      "type": "single_hop",
-      "difficulty": "hard",
-      "retrieved_docs": [
-        "09-cross-encoder.md",
         "08-rerank-rrf.md",
-        "08-rerank-rrf.md",
-        "09-cross-encoder.md",
-        "05-ann-index.md"
-      ],
-      "relevance": [
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 0.0,
-      "hit_at_3": 0.0,
-      "hit_at_5": 0.0,
-      "recall_at_3": 0.0,
-      "recall_at_5": 0.0,
-      "precision_at_3": 0.0,
-      "mrr": 0.0,
-      "ndcg_at_5": 0.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：邻，而是以高概率返回接近最优的结果。衡量指标是 **召回率（recall）**：ANN 返回的 Top-K 里包含多少真正的 Top-K。工程上通常把召回率调到 95% 以上，\n\n【用户问题】\nRRF 在什么情况下会失效，它有什么内在局限？",
-      "keyword_coverage": 0.0,
-      "context_recall": 0.6666666666666666,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.28
-    },
-    {
-      "id": "q29",
-      "question": "为什么 cross-encoder 不能直接用来做全库检索？",
-      "type": "single_hop",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "09-cross-encoder.md",
-        "09-cross-encoder.md",
-        "08-rerank-rrf.md",
-        "09-cross-encoder.md",
         "09-cross-encoder.md"
       ],
       "relevance": [
@@ -1153,7 +1075,46 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 0.8772153153380493,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：本档位：\n\n- **RRF**：不需要任何模型，只融合已有排序信号的名次。零成本，但无法产生新的相关性判断——如果所有召回信号都把错误片段排在第一，RRF 也救不\n\n【用户问题】\n为什么 cross-encoder 不能直接用来做全库检索？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾： 处在不同的成本档位：\n\n- **RRF**：不需要任何模型，只融合已有排序信号的名次。零成本，但无法产生新的相关性判断——如果所有召回信号都把错误片段排在第一，RRF 也救不\n\n【用户问题】\nRRF 的计算公式是什么，平滑常数通常取多少？",
+      "keyword_coverage": 0.3333333333333333,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 96.31
+    },
+    {
+      "id": "q28",
+      "question": "RRF 在什么情况下会失效，它有什么内在局限？",
+      "type": "single_hop",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "08-rerank-rrf.md",
+        "08-rerank-rrf.md",
+        "08-rerank-rrf.md",
+        "09-cross-encoder.md",
+        "09-cross-encoder.md"
+      ],
+      "relevance": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾： 处在不同的成本档位：\n\n- **RRF**：不需要任何模型，只融合已有排序信号的名次。零成本，但无法产生新的相关性判断——如果所有召回信号都把错误片段排在第一，RRF 也救不\n\n【用户问题】\nRRF 在什么情况下会失效，它有什么内在局限？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -1162,7 +1123,46 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.33
+      "latency_ms": 98.82
+    },
+    {
+      "id": "q29",
+      "question": "为什么 cross-encoder 不能直接用来做全库检索？",
+      "type": "single_hop",
+      "difficulty": "medium",
+      "retrieved_docs": [
+        "09-cross-encoder.md",
+        "09-cross-encoder.md",
+        "07-bm25-hybrid.md",
+        "09-cross-encoder.md",
+        "05-ann-index.md"
+      ],
+      "relevance": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 2,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.6666666666666666,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：失，通常与 IVF 组合使用（IVF-PQ），在十亿级数据集上是标准方案。\n\n## 选型建议\n\n按规模递进的经验路径：\n\n| 向量规模 | 推荐方案 | 理由 |\n\n【用户问题】\n为什么 cross-encoder 不能直接用来做全库检索？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 99.06
     },
     {
       "id": "q30",
@@ -1173,35 +1173,35 @@
         "09-cross-encoder.md",
         "09-cross-encoder.md",
         "09-cross-encoder.md",
-        "08-rerank-rrf.md",
-        "08-rerank-rrf.md"
+        "07-bm25-hybrid.md",
+        "09-cross-encoder.md"
       ],
       "relevance": [
         0,
-        0,
+        1,
         0,
         0,
         0
       ],
       "total_relevant": 1,
       "hit_at_1": 0.0,
-      "hit_at_3": 0.0,
-      "hit_at_5": 0.0,
-      "recall_at_3": 0.0,
-      "recall_at_5": 0.0,
-      "precision_at_3": 0.0,
-      "mrr": 0.0,
-      "ndcg_at_5": 0.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：der 精排 | 需要精排模型 | 最好 | 较高 | 对 Top-3 准确率要求高的场景 |\n\nRRF 的定位是**零依赖的中间方案**：不引入新模型就能融\n\n【用户问题】\ncross-encoder 精排时的候选数量一般取多少比较合适？",
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：颈在融合还是判断\"。如果多路召回结果各有所长、需要互补，RRF 就够了；如果召回结果的排序本身就不准，必须换更准的裁判，那就得上 cross-encoder。\n\n【用户问题】\ncross-encoder 精排时的候选数量一般取多少比较合适？",
       "keyword_coverage": 0.0,
-      "context_recall": 0.3333333333333333,
+      "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
       "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.29
+      "latency_ms": 98.51
     },
     {
       "id": "q31",
@@ -1210,8 +1210,8 @@
       "difficulty": "easy",
       "retrieved_docs": [
         "10-prompt-structure.md",
+        "11-hallucination.md",
         "01-rag-overview.md",
-        "15-ollama-local.md",
         "01-rag-overview.md",
         "11-hallucination.md"
       ],
@@ -1240,7 +1240,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.48
+      "latency_ms": 98.99
     },
     {
       "id": "q32",
@@ -1249,10 +1249,10 @@
       "difficulty": "hard",
       "retrieved_docs": [
         "10-prompt-structure.md",
-        "14-ragas-judge.md",
-        "11-hallucination.md",
-        "14-ragas-judge.md",
-        "01-rag-overview.md"
+        "09-cross-encoder.md",
+        "15-ollama-local.md",
+        "16-glm4-api.md",
+        "02-chunking-strategy.md"
       ],
       "relevance": [
         1,
@@ -1270,7 +1270,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\n\n## 与微调的区别\n\n微调（Fine-tuning）改变的是模型的\"表达风格与任务能力\"，RAG 改变的是模型\"能看到什么信息\"。两者并不互斥：常见组合是用微调让模\n\n【用户问题】\n大模型对上下文存在什么位置偏好，应该如何安排片段顺序？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：。\n- 有重叠时，块 A 的尾部与块 B 的头部重复了这整句话，至少有一块包含完整句子。\n\n重叠的代价是存储与计算量增加。重叠率通常在 chunk_size 的 10%\n\n【用户问题】\n大模型对上下文存在什么位置偏好，应该如何安排片段顺序？",
       "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -1279,7 +1279,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.78
+      "latency_ms": 97.55
     },
     {
       "id": "q33",
@@ -1287,16 +1287,55 @@
       "type": "single_hop",
       "difficulty": "medium",
       "retrieved_docs": [
-        "14-ragas-judge.md",
+        "11-hallucination.md",
         "11-hallucination.md",
         "10-prompt-structure.md",
         "01-rag-overview.md",
-        "15-ollama-local.md"
+        "14-ragas-judge.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：on Assessment）是专为 RAG 设计的评测框架，定义了四个关键指标，分别对应链路的不同环节。\n\n**1. Faithfulness（忠实度）**\n\n衡量答案是否完全由检\n\n【用户问题】\nRAG 场景下幻觉有哪几种典型表现和成因？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 102.14
+    },
+    {
+      "id": "q34",
+      "question": "缓解幻觉的提示词层面手段有哪些？",
+      "type": "single_hop",
+      "difficulty": "easy",
+      "retrieved_docs": [
+        "11-hallucination.md",
+        "14-ragas-judge.md",
+        "11-hallucination.md",
+        "11-hallucination.md",
+        "10-prompt-structure.md"
       ],
       "relevance": [
         0,
-        1,
         0,
+        1,
         0,
         0
       ],
@@ -1307,10 +1346,10 @@
       "recall_at_3": 1.0,
       "recall_at_5": 1.0,
       "precision_at_3": 0.3333333333333333,
-      "mrr": 0.5,
-      "ndcg_at_5": 0.6309297535714575,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：需切换云端模型提升生成质量。因为 RAG 的效果瓶颈主要在检索，本地小模型足以暴露检索问题；反过来，如果检索本身有问题，换云端大模型也只是在一个错误的上下文上生成更流畅的错误答案。\n\n【用户问题】\nRAG 场景下幻觉有哪几种典型表现和成因？",
-      "keyword_coverage": 0.0,
+      "mrr": 0.3333333333333333,
+      "ndcg_at_5": 0.5,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：文>\n\n    [2] 来源《文档名》片段3：\n    <片段正文>\n\n编号让模型可以在答案中用 `[1]` 这样的形式引用，也让前端能把引用映射回原文位置，实现可溯源。带上文档名和片段序号\n\n【用户问题】\n缓解幻觉的提示词层面手段有哪些？",
+      "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
@@ -1318,46 +1357,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.77
-    },
-    {
-      "id": "q34",
-      "question": "缓解幻觉的提示词层面手段有哪些？",
-      "type": "single_hop",
-      "difficulty": "easy",
-      "retrieved_docs": [
-        "11-hallucination.md",
-        "12-abstention-confidence.md",
-        "10-prompt-structure.md",
-        "04-vector-similarity.md",
-        "03-embedding-models.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：MB，内存完全放得下。若换成 1536 维、100 万条，则达到约 6 GB，此时就必须考虑量化压缩（如 int8 量化可降至 1/4）或磁盘索引。因此维度选择不只是效果问题，也是成本问题。\n\n【用户问题】\n缓解幻觉的提示词层面手段有哪些？",
-      "keyword_coverage": 0.0,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.13
+      "latency_ms": 97.44
     },
     {
       "id": "q35",
@@ -1366,9 +1366,48 @@
       "difficulty": "hard",
       "retrieved_docs": [
         "12-abstention-confidence.md",
+        "14-ragas-judge.md",
+        "14-ragas-judge.md",
+        "11-hallucination.md",
+        "12-abstention-confidence.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "total_relevant": 2,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 0.5,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.8503449055347546,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：相对占比\"，而不是\"这个答案有多可信\"。它有两个反直觉的性质：\n\n- **单片段场景恒为 1.0**：当只召回一个片段时，无论其原始相似度是\n\n【用户问题】\n把 confidence 定义成 score 除以分数总和，存在哪些反直觉的性质？",
+      "keyword_coverage": 0.6666666666666666,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 98.09
+    },
+    {
+      "id": "q36",
+      "question": "为什么评测集里必须包含无答案样本，对应什么指标？",
+      "type": "single_hop",
+      "difficulty": "medium",
+      "retrieved_docs": [
         "12-abstention-confidence.md",
-        "06-vector-db-selection.md",
-        "07-bm25-hybrid.md",
+        "14-ragas-judge.md",
+        "12-abstention-confidence.md",
+        "14-ragas-judge.md",
         "13-ir-metrics.md"
       ],
       "relevance": [
@@ -1387,7 +1426,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：型，MRR 就不合适——它无法反映\"第二个、第三个相关片段排在哪里\"。\n\n## nDCG：考虑相关度分级\n\n**nDCG（Normalize\n\n【用户问题】\n把 confidence 定义成 score 除以分数总和，存在哪些反直觉的性质？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：无法解读）\n4. **失败案例**（哪些查询没做好，为什么）\n\n缺少任何一项，指标数字都很难被采信。特别是第四项——只报成功率的评测报告通常意味着作者没有真正分析过系统缺陷。\n\n【用户问题】\n为什么评测集里必须包含无答案样本，对应什么指标？",
       "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -1396,19 +1435,175 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.34
+      "latency_ms": 97.26
     },
     {
-      "id": "q36",
-      "question": "为什么评测集里必须包含无答案样本，对应什么指标？",
+      "id": "q37",
+      "question": "Recall@K 和 Precision@K 的分母分别是什么，为什么这么设计？",
+      "type": "comparison",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "13-ir-metrics.md",
+        "13-ir-metrics.md",
+        "01-rag-overview.md",
+        "08-rerank-rrf.md",
+        "05-ann-index.md"
+      ],
+      "relevance": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：VF（Inverted File Index）先用 k-means 把所有向量聚成若干簇，每个簇维护一个倒排列表存成员向量。检索时先找出与查询\n\n【用户问题】\nRecall@K 和 Precision@K 的分母分别是什么，为什么这么设计？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 92.58
+    },
+    {
+      "id": "q38",
+      "question": "nDCG 为什么要用指数增益而不是线性增益？",
+      "type": "single_hop",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "13-ir-metrics.md",
+        "13-ir-metrics.md",
+        "14-ragas-judge.md",
+        "15-ollama-local.md",
+        "13-ir-metrics.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：说，如果希望召回多个相关片段一起喂给模型，MRR 就不合适——它无法反映\"第二个、第三个相关片段排在哪里\"。\n\n## nDCG：考虑相关度分级\n\n**nDCG（Normalize\n\n【用户问题】\nnDCG 为什么要用指数增益而不是线性增益？",
+      "keyword_coverage": 0.3333333333333333,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 99.48
+    },
+    {
+      "id": "q39",
+      "question": "计算 nDCG 时 IDCG 的正确做法是什么，容易犯什么错？",
+      "type": "single_hop",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "13-ir-metrics.md",
+        "13-ir-metrics.md",
+        "14-ragas-judge.md",
+        "13-ir-metrics.md",
+        "13-ir-metrics.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：标时必须同时给出 K 值**，\"Recall 95%\" 这种说法在没有 K 的情况下没有意义。\n\n一个容易踩的坑是 Precision@K 的分母选择：当库中片\n\n【用户问题】\n计算 nDCG 时 IDCG 的正确做法是什么，容易犯什么错？",
+      "keyword_coverage": 0.3333333333333333,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 96.45
+    },
+    {
+      "id": "q40",
+      "question": "为什么 BLEU 和 ROUGE 这类指标在 RAG 答案评测中会失效？",
       "type": "single_hop",
       "difficulty": "medium",
       "retrieved_docs": [
+        "14-ragas-judge.md",
         "12-abstention-confidence.md",
-        "07-bm25-hybrid.md",
         "12-abstention-confidence.md",
         "13-ir-metrics.md",
-        "05-ann-index.md"
+        "11-hallucination.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：校验环节，而不是假设 RAG 已经解决了问题。最低限度也应当保留引用信息，让用户能够自行核对答案依据——**可核查性比绝对正确更现实，也更有价值**。\n\n【用户问题】\n为什么 BLEU 和 ROUGE 这类指标在 RAG 答案评测中会失效？",
+      "keyword_coverage": 0.3333333333333333,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 99.48
+    },
+    {
+      "id": "q41",
+      "question": "RAGAS 的四个核心指标分别衡量什么？",
+      "type": "comparison",
+      "difficulty": "medium",
+      "retrieved_docs": [
+        "14-ragas-judge.md",
+        "11-hallucination.md",
+        "01-rag-overview.md",
+        "10-prompt-structure.md",
+        "01-rag-overview.md"
       ],
       "relevance": [
         1,
@@ -1426,211 +1621,16 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：# IVF：基于聚类的索引\n\nIVF（Inverted File Index）先用 k-means 把所有向量聚成若干簇，每个簇维护一个倒排列表存成员向量。检索时先找出与查询\n\n【用户问题】\n为什么评测集里必须包含无答案样本，对应什么指标？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：地方投入成本。\n\n## 与微调的区别\n\n微调（Fine-tuning）改变的是模型的\"表达风格与任务能力\"，RAG 改变的是模型\"能看到什么信息\"。两者并不互斥：常见组合是用微调让模\n\n【用户问题】\nRAGAS 的四个核心指标分别衡量什么？",
       "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
+      "context_recall": 0.6666666666666666,
       "faithfulness": null,
       "answer_relevancy": null,
       "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.13
-    },
-    {
-      "id": "q37",
-      "question": "Recall@K 和 Precision@K 的分母分别是什么，为什么这么设计？",
-      "type": "comparison",
-      "difficulty": "hard",
-      "retrieved_docs": [
-        "13-ir-metrics.md",
-        "13-ir-metrics.md",
-        "13-ir-metrics.md",
-        "14-ragas-judge.md",
-        "14-ragas-judge.md"
-      ],
-      "relevance": [
-        0,
-        0,
-        1,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 0.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 0.3333333333333333,
-      "ndcg_at_5": 0.5,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：惕：\n\n1. **位置偏差**：在成对比较中，裁判倾向于选择排在前面的选项。缓解方法是交换顺序各评一次，取平均。\n2. **长度偏差**：更长\n\n【用户问题】\nRecall@K 和 Precision@K 的分母分别是什么，为什么这么设计？",
-      "keyword_coverage": 0.0,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.32
-    },
-    {
-      "id": "q38",
-      "question": "nDCG 为什么要用指数增益而不是线性增益？",
-      "type": "single_hop",
-      "difficulty": "hard",
-      "retrieved_docs": [
-        "13-ir-metrics.md",
-        "13-ir-metrics.md",
-        "06-vector-db-selection.md",
-        "02-chunking-strategy.md",
-        "07-bm25-hybrid.md"
-      ],
-      "relevance": [
-        0,
-        1,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 0.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 0.5,
-      "ndcg_at_5": 0.6309297535714575,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：易命中词项，需要惩罚。参数 `b`（通常 0.75）控制归一化强度。\n\nBM25 完全基于词项精确匹配，没有任何语义泛化能力——\"排序算法\" 和 \"sorting algorit\n\n【用户问题】\nnDCG 为什么要用指数增益而不是线性增益？",
-      "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.85
-    },
-    {
-      "id": "q39",
-      "question": "计算 nDCG 时 IDCG 的正确做法是什么，容易犯什么错？",
-      "type": "single_hop",
-      "difficulty": "hard",
-      "retrieved_docs": [
-        "13-ir-metrics.md",
-        "13-ir-metrics.md",
-        "13-ir-metrics.md",
-        "03-embedding-models.md",
-        "06-vector-db-selection.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：sine\"})\n\n  若使用默认 L2，查询返回的 `distances` 是欧氏距离，把它当作相似度直接使用（例如取 `1 - distance`）会导致分数\n\n【用户问题】\n计算 nDCG 时 IDCG 的正确做法是什么，容易犯什么错？",
-      "keyword_coverage": 0.0,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.86
-    },
-    {
-      "id": "q40",
-      "question": "为什么 BLEU 和 ROUGE 这类指标在 RAG 答案评测中会失效？",
-      "type": "single_hop",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "14-ragas-judge.md",
-        "01-rag-overview.md",
-        "15-ollama-local.md",
-        "01-rag-overview.md",
-        "10-prompt-structure.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：段3：\n    <片段正文>\n\n编号让模型可以在答案中用 `[1]` 这样的形式引用，也让前端能把引用映射回原文位置，实现可溯源。带上文档名和片段序号\n\n【用户问题】\n为什么 BLEU 和 ROUGE 这类指标在 RAG 答案评测中会失效？",
-      "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.94
-    },
-    {
-      "id": "q41",
-      "question": "RAGAS 的四个核心指标分别衡量什么？",
-      "type": "comparison",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "14-ragas-judge.md",
-        "11-hallucination.md",
-        "01-rag-overview.md",
-        "15-ollama-local.md",
-        "14-ragas-judge.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        1
-      ],
-      "total_relevant": 2,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 0.5,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 0.8503449055347546,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：ion（上下文精度）**\n\n衡量检索到的上下文中，有多少是真正有助于回答问题的，以及有用的部分是否排在前面。它同时考虑了相关性和排序位置。\n\n**4. Context Recall（\n\n【用户问题】\nRAGAS 的四个核心指标分别衡量什么？",
-      "keyword_coverage": 0.6666666666666666,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.85
+      "latency_ms": 99.83
     },
     {
       "id": "q42",
@@ -1641,163 +1641,7 @@
         "14-ragas-judge.md",
         "14-ragas-judge.md",
         "13-ir-metrics.md",
-        "14-ragas-judge.md",
-        "06-vector-db-selection.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：10 万片段以内，Chroma 或单机 FAISS 完全够用**。把架构复杂度控制在数据规模之下，比盲目追求分布式更专业。\n\n【用户问题】\n如果 Context Recall 很高但 Faithfulness 很低，应该从哪个环节排查问题？",
-      "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.99
-    },
-    {
-      "id": "q43",
-      "question": "用 LLM 当裁判评分时有哪些已知的系统性偏差？",
-      "type": "single_hop",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "05-ann-index.md",
-        "14-ragas-judge.md",
-        "03-embedding-models.md",
-        "16-glm4-api.md",
-        "14-ragas-judge.md"
-      ],
-      "relevance": [
-        0,
-        1,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 0.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 0.5,
-      "ndcg_at_5": 0.6309297535714575,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：Assessment）是专为 RAG 设计的评测框架，定义了四个关键指标，分别对应链路的不同环节。\n\n**1. Faithfulness（忠实度）**\n\n衡量答案是否完全由检\n\n【用户问题】\n用 LLM 当裁判评分时有哪些已知的系统性偏差？",
-      "keyword_coverage": 0.0,
-      "context_recall": 0.6666666666666666,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 29.87
-    },
-    {
-      "id": "q44",
-      "question": "评测集设计时为什么要求知识库里存在主题相近的干扰文档？",
-      "type": "single_hop",
-      "difficulty": "hard",
-      "retrieved_docs": [
-        "14-ragas-judge.md",
-        "12-abstention-confidence.md",
-        "06-vector-db-selection.md",
-        "14-ragas-judge.md",
-        "05-ann-index.md"
-      ],
-      "relevance": [
-        1,
-        0,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 1.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 1.0,
-      "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：精度损失，通常与 IVF 组合使用（IVF-PQ），在十亿级数据集上是标准方案。\n\n## 选型建议\n\n按规模递进的经验路径：\n\n| 向量规模 | 推荐方案 | 理由 |\n\n【用户问题】\n评测集设计时为什么要求知识库里存在主题相近的干扰文档？",
-      "keyword_coverage": 0.0,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.18
-    },
-    {
-      "id": "q45",
-      "question": "Ollama 提供的 OpenAI 兼容接口路径是什么，有什么好处？",
-      "type": "single_hop",
-      "difficulty": "easy",
-      "retrieved_docs": [
-        "15-ollama-local.md",
-        "15-ollama-local.md",
-        "16-glm4-api.md",
-        "06-vector-db-selection.md",
-        "09-cross-encoder.md"
-      ],
-      "relevance": [
-        0,
-        1,
-        0,
-        0,
-        0
-      ],
-      "total_relevant": 1,
-      "hit_at_1": 0.0,
-      "hit_at_3": 1.0,
-      "hit_at_5": 1.0,
-      "recall_at_3": 1.0,
-      "recall_at_5": 1.0,
-      "precision_at_3": 0.3333333333333333,
-      "mrr": 0.5,
-      "ndcg_at_5": 0.6309297535714575,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：不能直接用它做检索\n\nCross-encoder 的精度优势是用计算量换来的。它无法预计算文档表示：**每来一个查询，都要把查询跟库中每一条文档重新拼接、\n\n【用户问题】\nOllama 提供的 OpenAI 兼容接口路径是什么，有什么好处？",
-      "keyword_coverage": 0.3333333333333333,
-      "context_recall": 1.0,
-      "faithfulness": null,
-      "answer_relevancy": null,
-      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
-      "judge_error": "mock_backend",
-      "is_unanswerable": false,
-      "abstained": false,
-      "latency_ms": 30.05
-    },
-    {
-      "id": "q46",
-      "question": "7B 参数模型量化后大约需要多少显存，显存不足会怎样？",
-      "type": "numeric",
-      "difficulty": "medium",
-      "retrieved_docs": [
-        "15-ollama-local.md",
-        "15-ollama-local.md",
-        "06-vector-db-selection.md",
-        "02-chunking-strategy.md",
+        "11-hallucination.md",
         "12-abstention-confidence.md"
       ],
       "relevance": [
@@ -1816,7 +1660,7 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：拒答权交给生成模型：在系统提示词中明确授权它说\"资料中未找到相关信息\"，并通过 few-shot 示例强化这一行为。\n\n优点是模型能理解语义层面的\"资料是否足以回答\"，\n\n【用户问题】\n7B 参数模型量化后大约需要多少显存，显存不足会怎样？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\"资料中未找到相关信息\"，并通过 few-shot 示例强化这一行为。\n\n优点是模型能理解语义层面的\"资料是否足以回答\"，\n\n【用户问题】\n如果 Context Recall 很高但 Faithfulness 很低，应该从哪个环节排查问题？",
       "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -1825,18 +1669,96 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 29.96
+      "latency_ms": 96.21
     },
     {
-      "id": "q47",
-      "question": "本地模型相比云端 API 最核心的价值是什么？",
+      "id": "q43",
+      "question": "用 LLM 当裁判评分时有哪些已知的系统性偏差？",
+      "type": "single_hop",
+      "difficulty": "medium",
+      "retrieved_docs": [
+        "14-ragas-judge.md",
+        "14-ragas-judge.md",
+        "14-ragas-judge.md",
+        "12-abstention-confidence.md",
+        "12-abstention-confidence.md"
+      ],
+      "relevance": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：因为提高召回、放宽阈值通常能提升\"有答案问题\"的指标，但会同步拉高误答率，而这些错误不会体现在常规检索指标里。\n\n评测集需要包含一批 **无答案样本（unanswerable\n\n【用户问题】\n用 LLM 当裁判评分时有哪些已知的系统性偏差？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 98.55
+    },
+    {
+      "id": "q44",
+      "question": "评测集设计时为什么要求知识库里存在主题相近的干扰文档？",
+      "type": "single_hop",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "14-ragas-judge.md",
+        "12-abstention-confidence.md",
+        "10-prompt-structure.md",
+        "11-hallucination.md",
+        "12-abstention-confidence.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：高召回、放宽阈值通常能提升\"有答案问题\"的指标，但会同步拉高误答率，而这些错误不会体现在常规检索指标里。\n\n评测集需要包含一批 **无答案样本（unanswerable\n\n【用户问题】\n评测集设计时为什么要求知识库里存在主题相近的干扰文档？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 96.71
+    },
+    {
+      "id": "q45",
+      "question": "Ollama 提供的 OpenAI 兼容接口路径是什么，有什么好处？",
       "type": "single_hop",
       "difficulty": "easy",
       "retrieved_docs": [
         "15-ollama-local.md",
+        "15-ollama-local.md",
         "16-glm4-api.md",
-        "03-embedding-models.md",
-        "13-ir-metrics.md",
+        "15-ollama-local.md",
         "16-glm4-api.md"
       ],
       "relevance": [
@@ -1855,8 +1777,8 @@
       "precision_at_3": 0.3333333333333333,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾： 10 并发）\n- 对 429（限流）和 5xx（服务端错误）做指数退避重试\n- 对 4xx（请求错误，如参数非法、余额不足）不要重试，直接失败\n\n区分错误类型很重要——对不可\n\n【用户问题】\n本地模型相比云端 API 最核心的价值是什么？",
-      "keyword_coverage": 0.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：服务与模型管理 |\n| 可用性 | 依赖外部服务 | 完全自主可控 |\n\n选择的关键在于**数据合规要求**和**质量要求**孰先。企业内部文档场景下，合\n\n【用户问题】\nOllama 提供的 OpenAI 兼容接口路径是什么，有什么好处？",
+      "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
@@ -1864,19 +1786,58 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 29.9
+      "latency_ms": 97.3
     },
     {
-      "id": "q48",
-      "question": "调用云端大模型 API 时，超时时间设置过长或过短各有什么风险？",
+      "id": "q46",
+      "question": "7B 参数模型量化后大约需要多少显存，显存不足会怎样？",
+      "type": "numeric",
+      "difficulty": "medium",
+      "retrieved_docs": [
+        "15-ollama-local.md",
+        "15-ollama-local.md",
+        "03-embedding-models.md",
+        "06-vector-db-selection.md",
+        "03-embedding-models.md"
+      ],
+      "relevance": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 0.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：U 上即可推理，适合中小规模知识库。bge-large-zh-v1.5 维度 1024，效果更好但需要 GPU 才实用。\n\n使用 BGE 做检索时有一个关键细节：**查\n\n【用户问题】\n7B 参数模型量化后大约需要多少显存，显存不足会怎样？",
+      "keyword_coverage": 0.3333333333333333,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 97.69
+    },
+    {
+      "id": "q47",
+      "question": "本地模型相比云端 API 最核心的价值是什么？",
       "type": "single_hop",
-      "difficulty": "hard",
+      "difficulty": "easy",
       "retrieved_docs": [
         "16-glm4-api.md",
         "15-ollama-local.md",
-        "13-ir-metrics.md",
         "16-glm4-api.md",
-        "05-ann-index.md"
+        "15-ollama-local.md",
+        "03-embedding-models.md"
       ],
       "relevance": [
         0,
@@ -1894,7 +1855,46 @@
       "precision_at_3": 0.0,
       "mrr": 0.25,
       "ndcg_at_5": 0.43067655807339306,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：通常与 IVF 组合使用（IVF-PQ），在十亿级数据集上是标准方案。\n\n## 选型建议\n\n按规模递进的经验路径：\n\n| 向量规模 | 推荐方案 | 理由 |\n\n【用户问题】\n调用云端大模型 API 时，超时时间设置过长或过短各有什么风险？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：ding\n\n在教学和单元测试场景中，常需要一个不依赖模型下载、结果确定的替代方案：**字符 n-gram 哈希**。做法是把文本拆成连续 n 个字符的片段（如 3-gram），\n\n【用户问题】\n本地模型相比云端 API 最核心的价值是什么？",
+      "keyword_coverage": 0.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
+      "judge_error": "mock_backend",
+      "is_unanswerable": false,
+      "abstained": false,
+      "latency_ms": 97.22
+    },
+    {
+      "id": "q48",
+      "question": "调用云端大模型 API 时，超时时间设置过长或过短各有什么风险？",
+      "type": "single_hop",
+      "difficulty": "hard",
+      "retrieved_docs": [
+        "16-glm4-api.md",
+        "16-glm4-api.md",
+        "16-glm4-api.md",
+        "15-ollama-local.md",
+        "15-ollama-local.md"
+      ],
+      "relevance": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total_relevant": 1,
+      "hit_at_1": 1.0,
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\n- **效果弱于云端旗舰模型**：7B 级本地模型在复杂推理、指令遵循、长上下文处理上与云端大模型有明显差距。对 RAG 而言，最直接的体现是\"依据资料作答\n\n【用户问题】\n调用云端大模型 API 时，超时时间设置过长或过短各有什么风险？",
       "keyword_coverage": 0.3333333333333333,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -1903,7 +1903,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.59
+      "latency_ms": 97.6
     },
     {
       "id": "q49",
@@ -1911,38 +1911,38 @@
       "type": "single_hop",
       "difficulty": "medium",
       "retrieved_docs": [
-        "03-embedding-models.md",
-        "13-ir-metrics.md",
         "16-glm4-api.md",
-        "14-ragas-judge.md",
-        "05-ann-index.md"
+        "16-glm4-api.md",
+        "16-glm4-api.md",
+        "10-prompt-structure.md",
+        "03-embedding-models.md"
       ],
       "relevance": [
         0,
-        0,
+        1,
         0,
         0,
         0
       ],
       "total_relevant": 1,
       "hit_at_1": 0.0,
-      "hit_at_3": 0.0,
-      "hit_at_5": 0.0,
-      "recall_at_3": 0.0,
-      "recall_at_5": 0.0,
-      "precision_at_3": 0.0,
-      "mrr": 0.0,
-      "ndcg_at_5": 0.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：度损失，通常与 IVF 组合使用（IVF-PQ），在十亿级数据集上是标准方案。\n\n## 选型建议\n\n按规模递进的经验路径：\n\n| 向量规模 | 推荐方案 | 理由 |\n\n【用户问题】\n调用外部 API 时应该怎么区分可重试和不可重试的错误？",
+      "hit_at_3": 1.0,
+      "hit_at_5": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg_at_5": 0.6309297535714575,
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：\n在教学和单元测试场景中，常需要一个不依赖模型下载、结果确定的替代方案：**字符 n-gram 哈希**。做法是把文本拆成连续 n 个字符的片段（如 3-gram），\n\n【用户问题】\n调用外部 API 时应该怎么区分可重试和不可重试的错误？",
       "keyword_coverage": 0.3333333333333333,
-      "context_recall": 0.6666666666666666,
+      "context_recall": 1.0,
       "faithfulness": null,
       "answer_relevancy": null,
       "judge_reason": "当前为 mock 生成后端，答案不构成真实作答，生成与拒答指标均不可用",
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 29.94
+      "latency_ms": 97.42
     },
     {
       "id": "q50",
@@ -1952,9 +1952,9 @@
       "retrieved_docs": [
         "16-glm4-api.md",
         "16-glm4-api.md",
-        "07-bm25-hybrid.md",
-        "14-ragas-judge.md",
-        "13-ir-metrics.md"
+        "16-glm4-api.md",
+        "15-ollama-local.md",
+        "08-rerank-rrf.md"
       ],
       "relevance": [
         1,
@@ -1972,7 +1972,7 @@
       "precision_at_3": 0.6666666666666666,
       "mrr": 1.0,
       "ndcg_at_5": 1.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：回多个相关片段一起喂给模型，MRR 就不合适——它无法反映\"第二个、第三个相关片段排在哪里\"。\n\n## nDCG：考虑相关度分级\n\n**nDCG（Normalize\n\n【用户问题】\nGLM-4 系列里 glm-4-flash 适合什么场景？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：*零依赖的中间方案**：不引入新模型就能融合多路排序信号，适合作为资源受限环境下的默认精排策略。当算力允许时，cross-encoder 在最终排序质量上明显更优。\n\n【用户问题】\nGLM-4 系列里 glm-4-flash 适合什么场景？",
       "keyword_coverage": 0.0,
       "context_recall": 1.0,
       "faithfulness": null,
@@ -1981,7 +1981,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": false,
       "abstained": false,
-      "latency_ms": 30.12
+      "latency_ms": 97.68
     },
     {
       "id": "q51",
@@ -1992,8 +1992,8 @@
         "02-chunking-strategy.md",
         "02-chunking-strategy.md",
         "02-chunking-strategy.md",
-        "06-vector-db-selection.md",
-        "14-ragas-judge.md"
+        "09-cross-encoder.md",
+        "03-embedding-models.md"
       ],
       "relevance": [],
       "total_relevant": 0,
@@ -2005,7 +2005,7 @@
       "precision_at_3": 0.0,
       "mrr": 0.0,
       "ndcg_at_5": 0.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：中，裁判倾向于选择排在前面的选项。缓解方法是交换顺序各评一次，取平均。\n2. **长度偏差**：更长\n\n【用户问题】\nLangChain 的 RecursiveCharacterTextSplitter 默认 chunk_size 是多少？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：虑量化压缩（如 int8 量化可降至 1/4）或磁盘索引。因此维度选择不只是效果问题，也是成本问题。\n\n【用户问题】\nLangChain 的 RecursiveCharacterTextSplitter 默认 chunk_size 是多少？",
       "keyword_coverage": 0.0,
       "context_recall": 0.0,
       "faithfulness": null,
@@ -2014,7 +2014,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": true,
       "abstained": false,
-      "latency_ms": 31.04
+      "latency_ms": 99.51
     },
     {
       "id": "q52",
@@ -2024,9 +2024,9 @@
       "retrieved_docs": [
         "06-vector-db-selection.md",
         "06-vector-db-selection.md",
-        "01-rag-overview.md",
-        "07-bm25-hybrid.md",
-        "13-ir-metrics.md"
+        "03-embedding-models.md",
+        "06-vector-db-selection.md",
+        "05-ann-index.md"
       ],
       "relevance": [],
       "total_relevant": 0,
@@ -2038,7 +2038,7 @@
       "precision_at_3": 0.0,
       "mrr": 0.0,
       "ndcg_at_5": 0.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：)=1），第 2 位除以 1.585，第 4 位除以 2.32，越往后折损越重。\n\n**3. 归一化（Normalization）**：DCG 的绝对值受查询影响——一个有很多相关\n\n【用户问题】\nMilvus 单节点最多能支撑多少条向量？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：以上。代价是精度损失，通常与 IVF 组合使用（IVF-PQ），在十亿级数据集上是标准方案。\n\n## 选型建议\n\n按规模递进的经验路径：\n\n| 向量规模 | 推荐方案 | 理由 |\n\n【用户问题】\nMilvus 单节点最多能支撑多少条向量？",
       "keyword_coverage": 0.0,
       "context_recall": 0.0,
       "faithfulness": null,
@@ -2047,7 +2047,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": true,
       "abstained": false,
-      "latency_ms": 29.56
+      "latency_ms": 98.86
     },
     {
       "id": "q53",
@@ -2055,11 +2055,11 @@
       "type": "unanswerable",
       "difficulty": "hard",
       "retrieved_docs": [
-        "14-ragas-judge.md",
         "11-hallucination.md",
         "14-ragas-judge.md",
         "15-ollama-local.md",
-        "14-ragas-judge.md"
+        "15-ollama-local.md",
+        "12-abstention-confidence.md"
       ],
       "relevance": [],
       "total_relevant": 0,
@@ -2071,7 +2071,7 @@
       "precision_at_3": 0.0,
       "mrr": 0.0,
       "ndcg_at_5": 0.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：使用时必须警惕：\n\n1. **位置偏差**：在成对比较中，裁判倾向于选择排在前面的选项。缓解方法是交换顺序各评一次，取平均。\n2. **长度偏差**：更长\n\n【用户问题】\nRAGAS 计算 faithfulness 时默认使用哪个裁判模型？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：op-K 中的相对占比\"，而不是\"这个答案有多可信\"。它有两个反直觉的性质：\n\n- **单片段场景恒为 1.0**：当只召回一个片段时，无论其原始相似度是\n\n【用户问题】\nRAGAS 计算 faithfulness 时默认使用哪个裁判模型？",
       "keyword_coverage": 0.0,
       "context_recall": 0.0,
       "faithfulness": null,
@@ -2080,7 +2080,7 @@
       "judge_error": "mock_backend",
       "is_unanswerable": true,
       "abstained": false,
-      "latency_ms": 30.31
+      "latency_ms": 98.43
     },
     {
       "id": "q54",
@@ -2088,11 +2088,11 @@
       "type": "unanswerable",
       "difficulty": "hard",
       "retrieved_docs": [
-        "09-cross-encoder.md",
-        "09-cross-encoder.md",
-        "08-rerank-rrf.md",
         "03-embedding-models.md",
-        "11-hallucination.md"
+        "03-embedding-models.md",
+        "01-rag-overview.md",
+        "09-cross-encoder.md",
+        "07-bm25-hybrid.md"
       ],
       "relevance": [],
       "total_relevant": 0,
@@ -2104,7 +2104,7 @@
       "precision_at_3": 0.0,
       "mrr": 0.0,
       "ndcg_at_5": 0.0,
-      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：*4. 长上下文中的注意力稀释**\n\n参考资料很长时，关键信息可能落在模型注意力薄弱的位置。模型会转而依赖自己的先验知识作答，等于绕过\n\n【用户问题】\nbge-reranker-large 相比 base 版本在中文检索上提升多少个百分点？",
+      "answer": "[mock] 已依据参考资料生成回答。上下文结尾：，引入 BM25 的边际收益可能不足以抵消复杂度。\n\n## 与重排序的区别\n\n需要注意，混合检索和重排序是**两个不同阶段的优化**：\n\n【用户问题】\nbge-reranker-large 相比 base 版本在中文检索上提升多少个百分点？",
       "keyword_coverage": 0.0,
       "context_recall": 0.0,
       "faithfulness": null,
@@ -2113,9 +2113,9 @@
       "judge_error": "mock_backend",
       "is_unanswerable": true,
       "abstained": false,
-      "latency_ms": 30.34
+      "latency_ms": 97.98
     }
   ],
-  "index_seconds": 0.06,
-  "eval_seconds": 1.706
+  "index_seconds": 6.789,
+  "eval_seconds": 8.3
 }
