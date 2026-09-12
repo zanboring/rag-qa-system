@@ -44,13 +44,11 @@ SCORE_TOLERANCE = 1e-4
 
 
 async def main() -> int:
-    try:
-        from app.vectorstore import ChromaVectorStore
-    except ImportError:
-        print("未安装 chromadb。请先执行：pip install -r requirements-chroma.txt", file=sys.stderr)
-        return 1
+    from app.vectorstore import ChromaVectorStore
 
     try:
+        # chromadb 是可选依赖，ChromaVectorStore 在构造时才真正 import，
+        # 因此这里捕获的是"未安装 chromadb"，而不是导入 app 模块失败。
         chroma = ChromaVectorStore("consistency_check")
     except ImportError:
         print("未安装 chromadb。请先执行：pip install -r requirements-chroma.txt", file=sys.stderr)
@@ -77,13 +75,21 @@ async def main() -> int:
         m_ids = [h["id"] for h in m_hits]
         c_ids = [h["id"] for h in c_hits]
 
+        m_top = f"{m_hits[0]['score']:.6f}" if m_hits else "（空）"
+        c_top = f"{c_hits[0]['score']:.6f}" if c_hits else "（空）"
+
         print(f"查询：{query}")
-        print(f"  memory  top3={m_ids}  top1_score={m_hits[0]['score']:.6f}")
-        print(f"  chroma  top3={c_ids}  top1_score={c_hits[0]['score']:.6f}")
+        print(f"  memory  top3={m_ids}  top1_score={m_top}")
+        print(f"  chroma  top3={c_ids}  top1_score={c_top}")
 
         if m_ids != c_ids:
             order_mismatch += 1
-            print("  ⚠ 排序不一致")
+            print("  ⚠ 返回条数或排序不一致")
+        elif not m_hits:
+            # 两侧都为空也是"行为一致"：查询与语料没有共同 n-gram 时，
+            # 相似度全为 0，会被过滤掉。这种情况必须显式说明，
+            # 否则看起来像"验证没跑"。
+            print("  两库均为空（查询与语料无共同 n-gram）— 行为一致")
         else:
             worst = max(abs(a["score"] - b["score"]) for a, b in zip(m_hits, c_hits))
             ok = worst < SCORE_TOLERANCE

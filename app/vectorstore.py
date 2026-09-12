@@ -140,7 +140,15 @@ class ChromaVectorStore(VectorStore):
         dists = res.get("distances", [[]])[0]
         for id, meta, dist in zip(ids, metas, dists):
             # 已指定 cosine 空间：distance = 1 - cosine_similarity
-            hits.append({"id": id, "score": 1 - dist, "metadata": meta})
+            score = 1 - dist
+            # 与 MemoryVectorStore 保持一致的过滤：丢弃相似度 <= 0 的片段。
+            # 为什么必须显式对齐：Chroma 不带这个过滤，会返回相关度为 0 甚至为负的
+            # 片段，而内存库会丢掉它们。同一份数据在两个后端下返回条数不同，
+            # 会直接导致 Hits/Recall 等指标不可比——评测的意义就不存在了。
+            # 这类"行为不一致"不会报错、不会崩溃，只会在对比报告里表现为
+            # 莫名的指标差异，因此必须靠跨后端一致性验证来暴露。
+            if score > 0:
+                hits.append({"id": id, "score": score, "metadata": meta})
         return hits
 
     async def delete(self, ids: list[str]) -> int:
