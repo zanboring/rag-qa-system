@@ -1,10 +1,18 @@
 """Embedding 向量化模块。
 
+可选后端（改环境变量 EMBEDDING_BACKEND 切换）：
+    hash    字符 n-gram 哈希，零依赖、确定性，用于离线演示与单测
+    bge     本地 BGE 模型（需 sentence-transformers）
+    ollama  本地 Ollama embedding 模型（需 ollama serve，默认 bge-m3）
+    zhipu   智谱云端 embedding API
+
 面试可讲点：
 - Embedding 把文本映射成高维向量，语义相近的文本向量距离更近。
-- 本项目默认用「字符 n-gram 哈希」做一个确定性、零依赖的 Embedding，
-  用于离线演示和单测；生产可切换到 BGE / 智谱 embedding 等真实模型。
+- 默认用 hash 是为了「零依赖可离线」，它做的是**词形匹配而非语义匹配**；
+  生产必须换真实语义模型，否则同义改写类的查询会大量漏召回。
 - 换模型只需改环境变量，符合「依赖注入 / 可插拔」的设计思想。
+- **选模型必须用目标语言验证**：实测 nomic-embed-text 英文正常、中文失效，
+  详见 config.OLLAMA_EMBED_MODEL 的说明。
 """
 
 import hashlib
@@ -68,6 +76,39 @@ class BgeEmbedder(Embedder):
         return await asyncio.to_thread(lambda: self.model.encode(text).tolist())
 
 
+class OllamaEmbedder(Embedder):
+    """Ollama 本地 embedding 模型（需 `ollama serve` 并已 pull 模型）。
+
+    适用场景：数据不能出本地，同时又要真实的语义检索能力——
+    这是「零依赖 hash」与「云端 API」之外的第三条路。
+
+    模型选择的坑：**必须用目标语言的语料验证**。
+    实测 nomic-embed-text 在英文上区分度良好（同义 0.84 / 无关 0.36），
+    但在中文上完全失效（同义 0.67 反而低于无关 0.71）——
+    只看模型知名度选型，会在中文场景得到一个"越不相关越相似"的检索器。
+    中文建议 bge-m3 / bge-large-zh 这类多语言或中文专用模型。
+    """
+
+    def __init__(self, base_url: str, model: str = "bge-m3", timeout: float = 120.0):
+        self.base_url = base_url.rstrip("/")
+        self.model = model
+        # 复用连接池；本地推理耗时波动大，超时给宽一些
+        self._client = httpx.AsyncClient(timeout=timeout)
+
+    async def aclose(self) -> None:
+        await self._client.aclose()
+
+    async def embed(self, text: str) -> list[float]:
+        # 用新版 /api/embed 接口：input 接受字符串或字符串数组，
+        # 响应统一为 embeddings 数组，便于后续扩展为批量调用。
+        resp = await self._client.post(
+            f"{self.base_url}/api/embed",
+            json={"model": self.model, "input": [text]},
+        )
+        resp.raise_for_status()
+        return resp.json()["embeddings"][0]
+
+
 class ZhipuEmbedder(Embedder):
     """智谱云端 Embedding（需 ZHIPU_API_KEY），生产可选。"""
 
@@ -98,6 +139,8 @@ def get_embedder() -> Embedder:
     """按配置返回 Embedder 实例。"""
     if config.EMBEDDING_BACKEND == "bge":
         return BgeEmbedder()
+    if config.EMBEDDING_BACKEND == "ollama":
+        return OllamaEmbedder(config.OLLAMA_BASE_URL, config.OLLAMA_EMBED_MODEL)
     if config.EMBEDDING_BACKEND == "zhipu":
         return ZhipuEmbedder(config.ZHIPU_API_KEY, config.ZHIPU_EMBED_MODEL)
     return HashEmbedder(config.HASH_EMBED_DIM)

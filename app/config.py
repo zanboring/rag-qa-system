@@ -30,6 +30,15 @@ OLLAMA_BASE_URL = (
 )
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 
+# Ollama 的 embedding 模型（EMBEDDING_BACKEND=ollama 时使用）。
+# 默认 bge-m3：多语言、中文效果良好。
+#
+# 刻意不把 nomic-embed-text 作为默认：实测它在**中文**上语义区分失效——
+# 同义改写的相似度（0.67）低于完全无关句（0.71），即"越不相关反而越相似"；
+# 而它在英文上表现正常（同义 0.84 / 无关 0.36）。加官方 search_ 前缀也无法挽救。
+# 这说明选 embedding 模型必须用**目标语言**的语料验证，不能只看模型知名度。
+OLLAMA_EMBED_MODEL = os.getenv("OLLAMA_EMBED_MODEL", "bge-m3")
+
 # ChromaDB 持久化路径。
 # 为空 → 使用纯内存模式，进程退出数据即丢失（适合本地开发与测试）；
 # 非空 → 数据落盘到该目录，容器重启后依然可检索（部署时必须设置）。
