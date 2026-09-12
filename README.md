@@ -279,10 +279,12 @@ mock 的输出是固定模板，关键词覆盖天然接近 0。若不接真实�
 ```bash
 python -m eval.validate_set                       # 第一步：先自检评测集
 python -m eval.run_eval --judge rule              # 零成本跑基线（纯检索，不调 LLM）
-python -m eval.run_eval --hash-dims 256,4096 --judge rule   # 对比哈希维度（表示能力）
-python -m eval.run_eval --embedding bge           # 换 BGE（需 pip install sentence-transformers）
-python -m eval.run_eval --llm deepseek --tag deepseek   # 接真实模型，产出忠实度等指标
-                                                       # --tag 让结果写入 report_deepseek.md，不覆盖基线
+python -m eval.run_eval --hash-dims 256,4096 --judge rule           # 对比哈希维度（表示能力）
+python -m eval.run_eval --embedding hash,ollama --hash-dims 4096 --judge rule
+                                                  # 对比词形 vs 语义（需 ollama pull bge-m3）
+python -m eval.run_eval --vector memory,chroma --judge rule         # 对比向量库（需 chromadb）
+python -m eval.run_eval --llm deepseek --tag deepseek               # 接真实模型，产出忠实度/拒答指标
+python -m eval.verify_vectorstore                 # 验证跨向量库的 score 与排序是否一致
 ```
 
 产出：`eval/results/report.md`（汇总报告）、`detail_*.json`（逐样本明细）。 

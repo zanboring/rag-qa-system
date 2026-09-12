@@ -562,6 +562,7 @@ async def main_async(args: argparse.Namespace) -> int:
 
     # 2. 组装配置矩阵
     embeddings = [e.strip() for e in args.embedding.split(",") if e.strip()]
+    vectors = [v.strip() for v in args.vector.split(",") if v.strip()]
     rerank_options = [False, True] if args.rerank == "both" else [args.rerank == "on"]
     hash_dims: list[int | None] = [int(d) for d in args.hash_dims.split(",") if d.strip()]
 
@@ -571,17 +572,18 @@ async def main_async(args: argparse.Namespace) -> int:
         # 否则会对 bge 生成多份完全相同的配置，白白重复跑评测。
         dims: list[int | None] = hash_dims if emb == "hash" else [None]
         for dim in dims:
-            for rr in rerank_options:
-                configs.append(
-                    EvalConfig(
-                        embedding=emb,
-                        vector=args.vector,
-                        llm=args.llm,
-                        rerank=rr,
-                        top_k=args.top_k,
-                        hash_dim=dim,
+            for vec in vectors:
+                for rr in rerank_options:
+                    configs.append(
+                        EvalConfig(
+                            embedding=emb,
+                            vector=vec,
+                            llm=args.llm,
+                            rerank=rr,
+                            top_k=args.top_k,
+                            hash_dim=dim,
+                        )
                     )
-                )
 
     # --judge rule 强制使用零依赖规则裁判。
     # 用途：纯检索评测（调切片、调 top_k、对比 embedding）不需要裁判，
@@ -656,7 +658,11 @@ def parse_args() -> argparse.Namespace:
         default="hash",
         help="embedding 后端，逗号分隔（hash / bge / zhipu），默认 hash",
     )
-    parser.add_argument("--vector", default="memory", help="向量库后端（memory / chroma）")
+    parser.add_argument(
+        "--vector",
+        default="memory",
+        help="向量库后端，逗号分隔（memory / chroma），默认 memory",
+    )
     parser.add_argument(
         "--llm", default="mock", help="生成后端（mock / ollama / deepseek / glm4）"
     )
