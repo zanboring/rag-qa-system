@@ -63,7 +63,7 @@ python -m venv .venv
 # .venv/bin/pip install -r requirements.txt        # macOS / Linux
 
 .venv/Scripts/uvicorn app.main:app --reload
-.venv/Scripts/python -m pytest -q                  # 62 个测试
+.venv/Scripts/python -m pytest -q                  # 74 个测试
 ```
 
 ### 试一下
